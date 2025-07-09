@@ -1,0 +1,45 @@
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import {
+  BarChart3,
+  Users,
+  Wallet,
+  Settings,
+  UserPlus
+} from 'lucide-react';
+
+const links = [
+  { path: '/dashboard', label: 'Tableau de bord', icon: BarChart3 },
+  { path: '/clients', label: 'Clients', icon: Users },
+  { path: '/assignments', label: 'Affectations', icon: Users },
+  { path: '/collectors', label: 'Collecteurs', icon: Users },
+  { path: '/transactions', label: 'Transactions', icon: Wallet },
+  { path: '/accounts', label: 'Demandes', icon: UserPlus },
+  { path: '/settings', label: 'Paramètres', icon: Settings },
+];
+
+export default function Sidebar() {
+  return (
+    <aside className="fixed inset-y-0 left-0 w-64 bg-white shadow-md">
+      <div className="p-6">
+        <h1 className="text-xl font-bold mb-6">BankAdmin</h1>
+        <nav className="space-y-2">
+          {links.map(({ path, label, icon: Icon }) => (
+            <NavLink
+              key={path}
+              to={path}
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 rounded-lg ${
+                  isActive ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`
+              }
+            >
+              <Icon className="w-5 h-5 mr-2" />
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+    </aside>
+  );
+}
