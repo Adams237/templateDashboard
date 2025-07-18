@@ -1,0 +1,26 @@
+{
+  "microfinace":{
+    "new":"Enregistrement d'une nouvelle microfinance",
+    "name":"Nom de la microfinance",
+    "email":"Email",
+    "phone_number":"Numero de telephone",
+    "city":"Ville",
+    "address":"Adresse",
+    "picture":"Logo de la microfinance",
+    "end":"Fin",
+    "next":"Suivant",
+    "document_type":"Type du document",
+    "document_number":"Numero d'identification du document",
+    "file":"Image du document",
+    "submit":"Creer"
+  },
+  "package":{
+    "title":"Liste des Licences Disponible",
+    "new":"Nouveau package",
+    "intitule":"Intitule",
+    "user_number":"Nombre d'utilisateur",
+    "transaction_number":"Nombre de transaction",
+    "price":"Prix par mois",
+    "date":"Date"
+  }
+}

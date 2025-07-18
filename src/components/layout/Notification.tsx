@@ -1,20 +1,20 @@
-import {motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { AlertTriangle, Bell, CheckCircle, XCircle } from 'lucide-react'
 import React from 'react'
 interface Alert {
-  id: string;
-  type: 'warning' | 'success' | 'error' | 'info';
-  message: string;
-  time: string;
-  read: boolean;
+    id: string;
+    type: 'warning' | 'success' | 'error' | 'info';
+    message: string;
+    time: string;
+    read: boolean;
 }
 
-interface NotificationProps{
-    showNotifications:boolean
-    setShowNotifications:(val:boolean)=>void
-    alerts:Alert[]
+interface NotificationProps {
+    showNotifications: boolean
+    setShowNotifications: (val: boolean) => void
+    alerts: Alert[]
 }
-function Notification({showNotifications,setShowNotifications,alerts}:NotificationProps) {
+function Notification({ showNotifications, setShowNotifications, alerts }: NotificationProps) {
     return (
         <>
             {/* Notifications Panel */}
@@ -43,14 +43,14 @@ function Notification({showNotifications,setShowNotifications,alerts}:Notificati
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         className={`p-4 rounded-lg ${alert.type === 'warning' ? 'bg-yellow-50' :
-                                                alert.type === 'success' ? 'bg-green-50' :
-                                                    alert.type === 'error' ? 'bg-red-50' : 'bg-blue-50'
+                                            alert.type === 'success' ? 'bg-green-50' :
+                                                alert.type === 'error' ? 'bg-red-50' : 'bg-blue-50'
                                             }`}
                                     >
                                         <div className="flex items-start space-x-3">
                                             <div className={`p-2 rounded-full ${alert.type === 'warning' ? 'bg-yellow-100' :
-                                                    alert.type === 'success' ? 'bg-green-100' :
-                                                        alert.type === 'error' ? 'bg-red-100' : 'bg-blue-100'
+                                                alert.type === 'success' ? 'bg-green-100' :
+                                                    alert.type === 'error' ? 'bg-red-100' : 'bg-blue-100'
                                                 }`}>
                                                 {alert.type === 'warning' ? (
                                                     <AlertTriangle className="h-5 w-5 text-yellow-600" />

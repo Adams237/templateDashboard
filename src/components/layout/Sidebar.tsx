@@ -1,30 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   BarChart3,
   Users,
-  Wallet,
   Settings,
-  UserPlus
+  RollerCoaster,
+  User,
+  Backpack,
 } from 'lucide-react';
+import { UserInterface } from '../../utils/interfaces/user.interface';
 
 const links = [
   { path: '/dashboard', label: 'Tableau de bord', icon: BarChart3 },
-  { path: '/clients', label: 'Clients', icon: Users },
-  { path: '/assignments', label: 'Affectations', icon: Users },
-  { path: '/collectors', label: 'Collecteurs', icon: Users },
-  { path: '/transactions', label: 'Transactions', icon: Wallet },
-  { path: '/accounts', label: 'Demandes', icon: UserPlus },
+  { path: '/clients', label: 'Microfinance', icon: Users },
+  { path: '/accounts', label: 'Packages', icon: Backpack },
   { path: '/settings', label: 'Paramètres', icon: Settings },
+  { path: '/account', label: 'Compte', icon: User },
 ];
 
-export default function Sidebar() {
+const linksAdmin=[
+  ...links,
+  {path:'/roles', label:"Roles",icon:RollerCoaster },
+  {path:'/users', label:"Users",icon:User },
+]
+
+interface SidebarProps{
+  user:UserInterface
+}
+export default function Sidebar({user}:SidebarProps) {
+  const [currentLink] = useState( linksAdmin)
+  console.log(user)
   return (
-    <aside className="fixed inset-y-0 left-0 w-64 bg-white shadow-md">
+    <aside className="fixed overflow-y-auto inset-y-0 left-0 w-64 bg-white shadow-md">
       <div className="p-6">
         <h1 className="text-xl font-bold mb-6">BankAdmin</h1>
         <nav className="space-y-2">
-          {links.map(({ path, label, icon: Icon }) => (
+          {currentLink.map(({ path, label, icon: Icon }) => (
             <NavLink
               key={path}
               to={path}

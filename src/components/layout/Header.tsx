@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { motion } from 'framer-motion';
-import { Bell, ChevronDown } from 'lucide-react';
+import {  ChevronDown,  UserCircle } from 'lucide-react';
 import Notification from './Notification';
 import Menu from './Menu';
 
@@ -60,7 +60,7 @@ export default function Header() {
       </div>
 
       <div className="flex items-center space-x-4">
-        <motion.button
+        {/* <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="relative"
@@ -72,7 +72,7 @@ export default function Header() {
               {alerts.filter(a => !a.read).length}
             </span>
           )}
-        </motion.button>
+        </motion.button> */}
 
         <motion.button
           whileHover={{ scale: 1.05 }}
@@ -81,11 +81,7 @@ export default function Header() {
           onClick={() => setShowUserMenu(!showUserMenu)}
         >
           <div className="flex items-center space-x-2">
-            <img
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-              alt="Admin"
-              className="h-8 w-8 rounded-full"
-            />
+           <UserCircle className='w-8 h-8'/>
             <ChevronDown className="h-4 w-4 text-gray-600" />
           </div>
         </motion.button>
