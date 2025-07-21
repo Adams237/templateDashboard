@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import {  MapPin, Phone, Mail, FileText, AlertTriangle, TrendingUp, User,  } from 'lucide-react';
+import { MapPin, Phone, Mail, FileText, AlertTriangle, TrendingUp, User, Loader, Eye, } from 'lucide-react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import Badge from '../ui/Badge';
 import Card from '../ui/Card';
 import Table from '../ui/Table';
-import { getTransactionStatusColor} from '../../data/mockClients';
+import { getStatusColor } from '../../data/mockClients';
 import { MICROFINANCES } from '../../data/microfinance';
 import { useTranslation } from 'react-i18next';
-import { DOCUMENTS } from '../../data/document';
 import { useParams } from 'react-router-dom';
 import { formaNumber } from '../../utils/feature/utils';
+import { useGetMicrofinanceByIdQuery } from '../../utils/feature/microfinance/microfinanceApi';
 
 
 
@@ -33,13 +33,14 @@ const ClientDetailsModal = () => {
   const { id } = useParams()
   const { t, } = useTranslation()
   const clientId = id ?? ""
+  const { data: client, isLoading, error } = useGetMicrofinanceByIdQuery(clientId)
 
-  const client = MICROFINANCES.find(c => c.user_id === clientId);
+
   console.log(client)
   // Move useEffect outside of conditional rendering
 
 
-  if (!client) return null;
+
   console.log("laaaaaaaaaa")
   const tabs = [
     { id: 'overview', label: 'Aperçu' },
@@ -50,266 +51,273 @@ const ClientDetailsModal = () => {
     { id: 'location', label: 'Localisation' },
   ];
 
+  if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500' /></div>
+  if (error) return <div className='flex items-center justify-center text-red-500 font-bold text-xl'>{t("load_error")}</div>
+  if (!client) return null;
+  console.log(client)
+  const create_at = new Date(client.created_at)
   return (
-   
-      <div className="space-y-6">
-        {/* Client Header Info */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">
 
-              <span className="text-gray-500 text-sm">Nom de la microfinance:</span> {client.name}
-            </h2>
-            <div className="mt-1 flex items-center space-x-2">
-              <Badge variant={getTransactionStatusColor(client.status)}>
-                {client.status === 'active' ? 'Actif' :
-                  client.status === 'inactive' ? 'Inactif' :
-                    'Suspendu'}
-              </Badge>
+    <div className="space-y-6">
+      {/* Client Header Info */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900">
 
-              \
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="text-sm text-gray-500">Client depuis</div>
-            <div className="font-medium">{client.created_at}</div>
+            <span className="text-gray-500 text-sm">Nom de la microfinance:</span> {client.name}
+          </h2>
+          <div className="mt-1 flex items-center space-x-2">
+            <Badge variant={getStatusColor(client.status.toLowerCase())}>
+              {client.status.toLowerCase() === 'active' ? 'Actif' :
+                client.status.toLowerCase() === 'inactive' ? 'Inactif' :
+                  'Suspendu'}
+            </Badge>
+
+
           </div>
         </div>
-
-        {/* Tabs Navigation */}
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`
-                  whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
-                  ${activeTab === tab.id
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
-                `}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        {/* Tab Content */}
-        <div className="mt-6">
-          {activeTab === 'location' && (
-            <div className="space-y-4">
-              <Card>
-                <Card.Body>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Position en temps réel</h3>
-                  {!GOOGLE_MAPS_API_KEY ? (
-                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                      <div className="flex">
-                        <div className="flex-shrink-0">
-                          <AlertTriangle className="h-5 w-5 text-yellow-400" />
-                        </div>
-                        <div className="ml-3">
-                          <p className="text-sm text-yellow-700">
-                            La clé API Google Maps n'est pas configurée. Veuillez ajouter la variable d'environnement VITE_GOOGLE_MAPS_API_KEY.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
-                        <GoogleMap
-                          mapContainerStyle={mapContainerStyle}
-                          center={client.latitude? { lat: client.latitude, lng: client.longitude }:defaultCenter }
-                          zoom={15}
-                        >
-                          {client.latitude && (
-                            <Marker
-                              position={{ lat: client.latitude, lng: client.longitude }}
-                              title={`${client.name} `}
-                            />
-                          )}
-                        </GoogleMap>
-                      </LoadScript>
-                      {client.latitude && (
-                        <div className="text-sm text-gray-600">
-                          <div>Latitude: {client.latitude.toFixed(6)}</div>
-                          <div>Longitude: {client.latitude.toFixed(6)}</div>
-                          <div className="mt-2">
-                            Dernière mise à jour: {new Date().toLocaleTimeString()}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </Card.Body>
-              </Card>
-              
-            </div>
-          )}
-
-          {activeTab === 'overview' && (
-            <div className="space-y-6">
-              {/* Contact Information */}
-              <Card>
-                <Card.Body>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">{t("client.information")}</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-start space-x-3">
-                      <Phone className="text-gray-400" size={20} />
-                      <div>
-                        <div className="font-medium">{client.phone_number}</div>
-                        <div className="text-sm text-gray-500">
-                          {t("client.phone")} ' ✓'
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <Mail className="text-gray-400" size={20} />
-                      <div>
-                        <div className="font-medium">{client.email}</div>
-                        <div className="text-sm text-gray-500">
-                          Email' ✓'
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <MapPin className="text-gray-400" size={20} />
-                      <div>
-                        <div className="font-medium">{client.city} /{client.address}</div>
-                        <div className="text-sm text-gray-500">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
-
-              {/* Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
-                  <Card.Body>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-gray-500">Total Transaction</p>
-                        <p className="text-2xl font-semibold">
-                          {formaNumber(MICROFINANCES.length)}
-                        </p>
-                      </div>
-                      <div className="p-3 bg-blue-100 rounded-full">
-                        <TrendingUp size={24} className="text-blue-600" />
-                      </div>
-                    </div>
-                  </Card.Body>
-                </Card>
-
-                <Card>
-                  <Card.Body>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-gray-500">Total client</p>
-                        <p className="text-2xl font-semibold">
-                          {formaNumber(MICROFINANCES.length)}
-                        </p>
-                      </div>
-                      <div className="p-3 bg-green-100 rounded-full">
-                        <User size={24} className="text-green-600" />
-                      </div>
-                    </div>
-                  </Card.Body>
-                </Card>
-                <Card>
-                  <Card.Body>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-gray-500">Total Collecteur</p>
-                        <p className="text-2xl font-semibold">
-                          {formaNumber(MICROFINANCES.length)}
-                        </p>
-                      </div>
-                      <div className="p-3 bg-gray-100 rounded-full">
-                        <AlertTriangle size={24} className="text-gray-600" />
-                      </div>
-                    </div>
-                  </Card.Body>
-                </Card>
-
-                
-              </div>
-
-              {/* Preferences */}
-              <Card>
-                <Card.Body>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Localisation</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500"></p>
-                      <p className="font-medium">{client.address}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Coordonnee geogrqphique</p>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                          <Badge  variant="secondary">
-                            {client.latitude}
-                          </Badge>
-                          <Badge  variant="secondary">
-                            {client.longitude}
-                          </Badge>
-                      </div>
-                    </div>
-                 
-                  </div>
-                </Card.Body>
-              </Card>
-
-            </div>
-          )}
-
-          
-
-          {activeTab === 'documents' && (
-            <div className="space-y-4">
-              <Table>
-                <Table.Head>
-                  <Table.Row>
-                    <Table.HeadCell>Type</Table.HeadCell>
-                    <Table.HeadCell>Numéro</Table.HeadCell>
-                    <Table.HeadCell>Date d'émission</Table.HeadCell>
-                    <Table.HeadCell>Date d'expiration</Table.HeadCell>
-                    <Table.HeadCell>Statut</Table.HeadCell>
-                    <Table.HeadCell>Vérifié par</Table.HeadCell>
-                  </Table.Row>
-                </Table.Head>
-                <Table.Body>
-                  {DOCUMENTS.map((document, index) => (
-                    <Table.Row key={index}>
-                      <Table.Cell>
-                        <div className="flex items-center">
-                          <FileText size={16} className="text-gray-400 mr-2" />
-                          <span>
-                            {document.document_type === 'ID' ? 'Pièce d\'identité' :
-                              document.document_type === 'proof_address' ? 'Justificatif de domicile' :
-                                document.document_type === 'business_registration' ? 'Registre de commerce' :
-                                  'Document fiscal'}
-                          </span>
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell>{document.document_number}</Table.Cell>
-                      <Table.Cell>{document.created_at}</Table.Cell>
-                      <Table.Cell>{document.updated_at}</Table.Cell>
-                     
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table>
-            </div>
-          )}
-
-         
+        <div className="text-right">
+          <div className="text-sm text-gray-500">Client depuis</div>
+          <div className="font-medium">{create_at.toLocaleDateString()}</div>
         </div>
       </div>
-    
+
+      {/* Tabs Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              className={`
+                  whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
+                  ${activeTab === tab.id
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
+                `}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      <div className="mt-6">
+        {activeTab === 'location' && (
+          <div className="space-y-4">
+            <Card>
+              <Card.Body>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Position en temps réel</h3>
+                {!GOOGLE_MAPS_API_KEY ? (
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <AlertTriangle className="h-5 w-5 text-yellow-400" />
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-yellow-700">
+                          La clé API Google Maps n'est pas configurée. Veuillez ajouter la variable d'environnement VITE_GOOGLE_MAPS_API_KEY.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+                      <GoogleMap
+                        mapContainerStyle={mapContainerStyle}
+                        center={client.latitude ? { lat: client.latitude, lng: client.longitude } : defaultCenter}
+                        zoom={15}
+                      >
+                        {client.latitude && (
+                          <Marker
+                            position={{ lat: client.latitude, lng: client.longitude }}
+                            title={`${client.name} `}
+                          />
+                        )}
+                      </GoogleMap>
+                    </LoadScript>
+                    {client.latitude && (
+                      <div className="text-sm text-gray-600">
+                        <div>Latitude: {client.latitude.toFixed(6)}</div>
+                        <div>Longitude: {client.latitude.toFixed(6)}</div>
+                        <div className="mt-2">
+                          Dernière mise à jour: {new Date().toLocaleTimeString()}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </Card.Body>
+            </Card>
+
+          </div>
+        )}
+
+        {activeTab === 'overview' && (
+          <div className="space-y-6">
+            {/* Contact Information */}
+            <Card>
+              <Card.Body>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">{t("client.information")}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-start space-x-3">
+                    <Phone className="text-gray-400" size={20} />
+                    <div>
+                      <div className="font-medium">{client.phone_number}</div>
+                      <div className="text-sm text-gray-500">
+                        {t("client.phone")} ' ✓'
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <Mail className="text-gray-400" size={20} />
+                    <div>
+                      <div className="font-medium">{client.email}</div>
+                      <div className="text-sm text-gray-500">
+                        Email' ✓'
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <MapPin className="text-gray-400" size={20} />
+                    <div>
+                      <div className="font-medium">{client.city} /{client.address}</div>
+                      <div className="text-sm text-gray-500">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+
+            {/* Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <Card.Body>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500">Total Transaction</p>
+                      <p className="text-2xl font-semibold">
+                        {formaNumber(MICROFINANCES.length)}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-blue-100 rounded-full">
+                      <TrendingUp size={24} className="text-blue-600" />
+                    </div>
+                  </div>
+                </Card.Body>
+              </Card>
+
+              <Card>
+                <Card.Body>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500">Total client</p>
+                      <p className="text-2xl font-semibold">
+                        {formaNumber(MICROFINANCES.length)}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-green-100 rounded-full">
+                      <User size={24} className="text-green-600" />
+                    </div>
+                  </div>
+                </Card.Body>
+              </Card>
+              <Card>
+                <Card.Body>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500">Total Collecteur</p>
+                      <p className="text-2xl font-semibold">
+                        {formaNumber(MICROFINANCES.length)}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-gray-100 rounded-full">
+                      <AlertTriangle size={24} className="text-gray-600" />
+                    </div>
+                  </div>
+                </Card.Body>
+              </Card>
+
+
+            </div>
+
+            {/* Preferences */}
+            <Card>
+              <Card.Body>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Localisation</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500"></p>
+                    <p className="font-medium">{client.address}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Coordonnee geogrqphique</p>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      <Badge variant="secondary">
+                        {client.latitude}
+                      </Badge>
+                      <Badge variant="secondary">
+                        {client.longitude}
+                      </Badge>
+                    </div>
+                  </div>
+
+                </div>
+              </Card.Body>
+            </Card>
+
+          </div>
+        )}
+
+
+
+        {activeTab === 'documents' && (
+          <div className="space-y-4">
+            <Table>
+              <Table.Head>
+                <Table.Row>
+                  <Table.HeadCell>Type</Table.HeadCell>
+                  <Table.HeadCell>Numéro</Table.HeadCell>
+                  <Table.HeadCell>Date d'émission</Table.HeadCell>
+                  <Table.HeadCell>Date d'expiration</Table.HeadCell>
+                  <Table.HeadCell>Statut</Table.HeadCell>
+                </Table.Row>
+              </Table.Head>
+              <Table.Body>
+                {client.Documents?.map((document, index) => {
+                  const date_delivrance = new Date(document.created_at)
+                  const date_expire = new Date(document.updated_at)
+                 return <Table.Row key={index}>
+                    <Table.Cell>
+                      <div className="flex items-center">
+                        <FileText size={16} className="text-gray-400 mr-2" />
+                        <span>
+                          {document.document_type === 'ID' ? 'Pièce d\'identité' :
+                            document.document_type === 'proof_address' ? 'Justificatif de domicile' :
+                              document.document_type === 'business_registration' ? 'Registre de commerce' :
+                                'Document fiscal'}
+                        </span>
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell>{document.document_number}</Table.Cell>
+                    <Table.Cell>{date_delivrance.toLocaleDateString()}</Table.Cell>
+                    <Table.Cell>{date_expire.toLocaleDateString()}</Table.Cell>
+                    <Table.Cell className='cursor-pointer'><Eye/></Table.Cell>
+
+                  </Table.Row>
+                })}
+              </Table.Body>
+            </Table>
+          </div>
+        )}
+
+
+      </div>
+    </div>
+
   );
 };
 

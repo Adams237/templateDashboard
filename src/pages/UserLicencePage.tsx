@@ -1,37 +1,32 @@
 import React, { useState } from 'react';
-import { Search, Filter, Users, TrendingUp, AlertTriangle, Newspaper, Loader, } from 'lucide-react';
-import Table from '../ui/Table';
-import Badge from '../ui/Badge';
-import Button from '../ui/Button';
-import Card from '../ui/Card';
-import { getStatusColor } from '../../data/mockClients';
-import { MICROFINANCES } from '../../data/microfinance';
+import { Search, Filter,  Users, TrendingUp, AlertTriangle, } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { formaNumber } from '../../utils/feature/utils';
-import { useGetAllMicrofinanceQuery } from '../../utils/feature/microfinance/microfinanceApi';
+import { USERLICENCE } from '../data/user_licence';
+import Card from '../components/ui/Card';
+import { formaNumber } from '../utils/feature/utils';
+import Button from '../components/ui/Button';
+import Table from '../components/ui/Table';
+import { getStatusColor } from '../data/mockClients';
+import Badge from '../components/ui/Badge';
 
-const ClientDashboard = () => {
+const UserLicencePage = () => {
   const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1)
   const limit = 10
-  const { data: microfinance, isLoading, error, isFetching } = useGetAllMicrofinanceQuery({ page, limit })
 
   const navigate = useNavigate()
 
-  const filteredClients = microfinance?.data.filter(client => {
-    if (statusFilter !== 'all' && client.status !== statusFilter) return false;
+  const filteredClients = USERLICENCE.filter(client => {
+    if (statusFilter !== 'all' && client.license_status !== statusFilter) return false;
 
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       return (
-        client.name.toLowerCase().includes(searchLower) ||
-        client.email.toLowerCase().includes(searchLower) ||
-        client.phone_number.toLowerCase().includes(searchLower) ||
-        client.address.toLowerCase().includes(searchLower) ||
-        client.city.toLowerCase().includes(searchLower)
+        client.user.name.toLowerCase().includes(searchLower) ||
+        client.plan.name.toLowerCase().includes(searchLower) 
       );
     }
 
@@ -40,19 +35,12 @@ const ClientDashboard = () => {
 
   // Calculate summary statistics
   const summaryStats = {
-    totalClients: MICROFINANCES.length,
-    activeClients: MICROFINANCES.filter(c => c.status === 'active').length,
-    totalCollected: MICROFINANCES.length,
-    averageSuccess: (MICROFINANCES.filter(c => c.status === 'active').length / MICROFINANCES.length) * 100
+    totalClients: USERLICENCE.length,
+    activeClients: USERLICENCE.filter(c => c.license_status.toLowerCase() === 'active').length,
+    averageSuccess: (USERLICENCE.filter(c => c.license_status.toLowerCase() === 'active').length / USERLICENCE.length) * 100
   };
 
-  if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500' /></div>
-  if (error) {
-    console.log(error)
-    return <div className='flex items-center justify-center text-red-500 font-bold text-xl'>{t("load_error")}</div>
-  }
 
-  console.log(microfinance)
   return (
     <div className="  space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -60,7 +48,7 @@ const ClientDashboard = () => {
           <Card.Body>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Clients actifs</p>
+                <p className="text-sm text-gray-500">{t("licence.client_actif")}</p>
                 <p className="text-2xl font-semibold">{formaNumber(summaryStats.activeClients)}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
@@ -74,7 +62,7 @@ const ClientDashboard = () => {
           <Card.Body>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Total Microfinance</p>
+                <p className="text-sm text-gray-500">{t("licence.all_client")}</p>
                 <p className="text-2xl font-semibold">{formaNumber(summaryStats.totalClients)}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
@@ -88,7 +76,7 @@ const ClientDashboard = () => {
           <Card.Body>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">pourcentage de microfinance active</p>
+                <p className="text-sm text-gray-500">{t("licence.pourcentage")}</p>
                 <p className="text-2xl font-semibold">{parseInt(String(summaryStats.averageSuccess))}%</p>
               </div>
               <div className="p-3 bg-purple-100 rounded-full">
@@ -106,7 +94,7 @@ const ClientDashboard = () => {
           </div>
           <input
             type="text"
-            placeholder="Rechercher un client par nom, code..."
+            placeholder={t("licence.search")}
             className="pl-10 block h-9 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -122,19 +110,20 @@ const ClientDashboard = () => {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <option value="all">Tous les statuts</option>
-              <option value="ACTIVE">Actifs</option>
-              <option value="INACTIVE">Inactifs</option>
+              <option value="all">{t("licence.all_status")}</option>
+              <option value="ACTIVE">{t("licence.actif")}</option>
+              <option value="SUSPENDED">{t("licence.suspendue")}</option>
+              <option value="EXPIRED">{t("licence.expired")}</option>
             </select>
           </div>
 
-          <Button
+          {/* <Button
             variant="primary"
-            onClick={() => navigate("/new-microfinance")}
+            onClick={()=>navigate("/new-microfinance")}
             icon={<Newspaper size={16} />}
           >
             Nouvelle microfinance
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -143,57 +132,40 @@ const ClientDashboard = () => {
         <Table>
           <Table.Head>
             <Table.Row>
-              <Table.HeadCell>Client</Table.HeadCell>
-              <Table.HeadCell>Statut</Table.HeadCell>
-              <Table.HeadCell>Email</Table.HeadCell>
-              <Table.HeadCell>Phone</Table.HeadCell>
-              <Table.HeadCell>Adresse</Table.HeadCell>
-              <Table.HeadCell>Date de creation</Table.HeadCell>
+              <Table.HeadCell>{t("licence.microfinance")}</Table.HeadCell>
+              <Table.HeadCell>{t("licence.status")}</Table.HeadCell>
+              <Table.HeadCell>{t("licence.create_at")}</Table.HeadCell>
+              <Table.HeadCell>{t("licence.licence")}</Table.HeadCell>
               <Table.HeadCell>Actions</Table.HeadCell>
             </Table.Row>
           </Table.Head>
           <Table.Body>
-            {filteredClients?.slice(page, limit).map((client) => (
-              <Table.Row key={client.updated_at}>
+            {filteredClients.map((client) => (
+              <Table.Row key={client.tenant_license_id}>
                 <Table.Cell>
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-200 flex items-center justify-center">
-                      {client.profile_picture ? <img src={client.profile_picture} alt="" /> :
-                        client.name.charAt(0)}
-                    </div>
-                    <div className="ml-4">
-                      <div className="font-medium text-gray-900">
-                        {client.name}
-                      </div>
-
-                    </div>
-                  </div>
+                      {client.user.name}
+                        
+                 
                 </Table.Cell>
 
                 <Table.Cell>
-                  <Badge variant={getStatusColor(client.status.toLowerCase())}>
-                    {client.status.toLowerCase() === 'active' ? 'Actif' :
-                      client.status.toLowerCase() === 'inactive' ? 'Inactif' :
+                  <Badge variant={getStatusColor(client.license_status.toLowerCase())}>
+                    {client.license_status.toLowerCase() === 'active' ? 'Actif' :
+                      client.license_status.toLowerCase() === 'expired' ? 'EXPIRED' :
                         'Suspendu'}
                   </Badge>
-                </Table.Cell>
-                <Table.Cell>
-                  <div>{client.email}</div>
-                </Table.Cell>
-                <Table.Cell>
-                  <div>{client.phone_number}</div>
-                </Table.Cell>
-                <Table.Cell>
-                  <div>{client.city}</div>
                 </Table.Cell>
                 <Table.Cell>
                   <div>{client.created_at}</div>
                 </Table.Cell>
                 <Table.Cell>
+                  <div>{client.plan.name}</div>
+                </Table.Cell>
+                <Table.Cell>
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => navigate(`/clients/${client.user_id}`)}
+                    onClick={() => navigate(`/clients/${client.tenant_license_id}`)}
                   >
                     Détails
                   </Button>
@@ -205,23 +177,22 @@ const ClientDashboard = () => {
         <div className="flex items-center justify-between mt-4">
           <button
             onClick={() => setPage((p) => Math.max(p - 1, 1))}
-            disabled={page === 1 || isFetching}
+            disabled={page === 1}
             className="px-3 py-1 border rounded disabled:opacity-50"
           >
-            ‹ {t("preavu")}
+            ‹ {t("zone.preavu")}
           </button>
 
           <span>
-            Page {microfinance?.meta.page} sur {microfinance?.meta.totalPages}
-            {isFetching && ' …'}
+            Page {page} sur {summaryStats.totalClients / limit}
           </span>
 
           <button
-            onClick={() => setPage((p) => Math.min(p + 1, microfinance?.meta.totalPages ?? 1))}
-            disabled={page === (microfinance?.meta.totalPages ?? 1) || isFetching}
+            onClick={() => setPage((p) => Math.min(p + 1, limit ?? 1))}
+            disabled={page === (limit ?? 1)}
             className="px-3 py-1 border rounded disabled:opacity-50"
           >
-            {t("next")} ›
+            {t("zone.next")} ›
           </button>
         </div>
       </div>
@@ -233,4 +204,4 @@ const ClientDashboard = () => {
   );
 };
 
-export default ClientDashboard;
+export default UserLicencePage;

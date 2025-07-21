@@ -21,6 +21,38 @@
     "user_number":"Nombre d'utilisateur",
     "transaction_number":"Nombre de transaction",
     "price":"Prix par mois",
-    "date":"Date"
-  }
+    "date":"Date",
+    "month_number":"Numbre de mois",
+    "success_created":"Nouveau package creer avec success",
+    "number_of_months":"Nombre de mois",
+    "actions":"Actions",
+    "success_deleted":"Suppression effectuer avec success",
+    "update":"Mettre a jour la licence",
+    "success_update":"Licence Mise a jour avec success"
+  },
+  "licence":{
+    "client_actif":"Clients actifs",
+    "all_client":"Total Microfinance",
+    "pourcentage":"Pourcentage de microfinance active",
+    "search":"Rechercher une licence par nom, plan...",
+    "all_status":"Tous les statuts",
+    "actif":"Actives",
+    "suspendue":"Suspendues",
+    "expired":"Expirees",
+    "microfinance":"Nom de la microfinance",
+    "status":"Statut",
+    "create_at":"Date de creation",
+    "licence":"Licence"
+  },
+  "auth":{
+    "login":"Connexion",
+    "phone_number":"Numero de telephone",
+    "password":"Mot de passe",
+    "verify":"Verifier le numero de telephone",
+    "enter_otp_code":"Entrer le code envoye a votre numero par sms",
+    "verify_buttom":"Verifier"
+  },
+  "load_error":"Erreur lors du chargement",
+  "next":"Suivant",
+  "preavu":"Retour"
 }

@@ -2,23 +2,24 @@
 import React  from 'react'
 import { useForm} from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { LicenceRequest } from '../../utils/feature/licence/type';
+import {  LicenceResponse } from '../../utils/feature/licence/type';
 
 // 1. Définition des données du formulaire
 
 
 interface DataProps {
-    onSubmit: (data: LicenceRequest) => Promise<void> | void,
+    onSubmit: (data: LicenceResponse) => Promise<void> | void,
+    licence:LicenceResponse
 }
 
 // Regex pour numéro camerounais
-const NewLicenceForm: React.FC<DataProps> = ({ onSubmit }) => {
+const UpdateLicenceForm: React.FC<DataProps> = ({ onSubmit,licence }) => {
     const { t } = useTranslation()
     const {
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
-    } = useForm<LicenceRequest>()
+    } = useForm<LicenceResponse>({defaultValues:licence})
 
     return (
         <form
@@ -28,7 +29,7 @@ const NewLicenceForm: React.FC<DataProps> = ({ onSubmit }) => {
            
 
             <h2 className="text-2xl font-bold text-center">
-                {t("package.new")}
+                {t("package.update")}
             </h2>
 
             <div className='grid  grid-cols-1 space-x-2'>
@@ -151,26 +152,17 @@ const NewLicenceForm: React.FC<DataProps> = ({ onSubmit }) => {
                         </p>
                     )}
                 </div>
-
-
-               
-
-
-              
             </div>
-
-
-
             {/* Bouton de Soumission */}
             <button
                 type="submit"
                 disabled={isSubmitting}
                 className="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
             >
-                {isSubmitting ? t("...") : t("microfinace.submit")}
+                {isSubmitting ? t("...") : t("package.update")}
             </button>
         </form>
     )
 }
 
-export default NewLicenceForm
+export default UpdateLicenceForm

@@ -7,6 +7,7 @@ import {
   RollerCoaster,
   User,
   Backpack,
+  KeyboardMusic,
 } from 'lucide-react';
 import { UserInterface } from '../../utils/interfaces/user.interface';
 
@@ -16,6 +17,7 @@ const links = [
   { path: '/accounts', label: 'Packages', icon: Backpack },
   { path: '/settings', label: 'Paramètres', icon: Settings },
   { path: '/account', label: 'Compte', icon: User },
+  { path: '/licence-microfinance', label: 'Licences', icon: KeyboardMusic },
 ];
 
 const linksAdmin=[

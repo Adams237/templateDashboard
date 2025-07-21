@@ -33,3 +33,14 @@ export interface ClientInterface {
     montant: number,
     paiementMethode: string
 }
+
+
+export interface pagination<T> {
+    data: T[]
+    meta: {
+        page: number,
+        totalPages: number,
+        perPage: number,
+        total: number
+    }
+}

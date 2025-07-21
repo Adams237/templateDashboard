@@ -16,11 +16,11 @@ import Layout from './components/layout/Layout';
 import { ToastContainer } from 'react-toastify';
 import ClientDetailsModal from './components/clients/ClientDetailsModal';
 import NewMicrofinance from './pages/NewMicrofinance';
-import LicencePage from './pages/LicencePage';
+import LicencePage from './pages/Licences/LicencePage';
+import UserLicencePage from './pages/UserLicencePage';
 
 export default function App() {
   initCryptoKeys().catch(console.error);
-  console.log(";;;;;;;;;;;")
   return (
     <BrowserRouter>
       <Routes>
@@ -44,6 +44,7 @@ export default function App() {
             <Route path="assignments" element={<AssignmentsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="new-microfinance" element={<NewMicrofinance />} />
+            <Route path="licence-microfinance" element={<UserLicencePage />} />
             <Route path="*" element={<div>404 - Page non trouvée</div>} />
           </Route>
         </Route>
