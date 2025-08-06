@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { enUS, fr } from 'date-fns/locale';
 import { motion } from 'framer-motion';
 import {  ChevronDown,  UserCircle } from 'lucide-react';
 import Notification from './Notification';
 import Menu from './Menu';
+import { useTranslation } from 'react-i18next';
+import Button from '../ui/Button';
 
 interface Alert {
   id: string;
@@ -14,9 +16,15 @@ interface Alert {
   read: boolean;
 }
 export default function Header() {
-  const today = format(new Date(), 'EEEE d MMMM yyyy', { locale: fr });
+  const { i18n } = useTranslation()
+  const today = format(new Date(), 'EEEE d MMMM yyyy', { locale: i18n.language === 'fr' ? fr : enUS });
+ 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  const handleChangeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+  }
   const [alerts] = useState<Alert[]>([
     {
       id: '1',
@@ -60,20 +68,11 @@ export default function Header() {
       </div>
 
       <div className="flex items-center space-x-4">
-        {/* <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="relative"
-          onClick={() => setShowNotifications(!showNotifications)}
-        >
-          <Bell className="h-6 w-6 text-gray-600" />
-          {alerts.filter(a => !a.read).length > 0 && (
-            <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full flex items-center justify-center text-xs text-white">
-              {alerts.filter(a => !a.read).length}
-            </span>
-          )}
-        </motion.button> */}
-
+        
+        <div className='flex items-center space-x-2'>
+          <Button variant={i18n.language === 'fr' ? 'primary' : 'outline'} onClick={() => handleChangeLanguage('fr')}>FR</Button>
+          <Button variant={i18n.language === 'en' ? 'primary' : 'outline'} onClick={() => handleChangeLanguage('en')}>EN</Button>
+        </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

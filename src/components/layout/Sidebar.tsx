@@ -9,7 +9,7 @@ import {
   Backpack,
   KeyboardMusic,
 } from 'lucide-react';
-import { UserInterface } from '../../utils/interfaces/user.interface';
+// import { UserInterface } from '../../utils/interfaces/user.interface';
 
 const links = [
   { path: '/dashboard', label: 'Tableau de bord', icon: BarChart3 },
@@ -26,15 +26,15 @@ const linksAdmin=[
   {path:'/users', label:"Users",icon:User },
 ]
 
-interface SidebarProps{
-  user:UserInterface
-}
-export default function Sidebar({user}:SidebarProps) {
+// interface SidebarProps{
+//   user:UserInterface
+// }
+export default function Sidebar() {
   const [currentLink] = useState( linksAdmin)
-  console.log(user)
+  // console.log(user)
   return (
-    <aside className="fixed overflow-y-auto inset-y-0 left-0 w-64 bg-white shadow-md">
-      <div className="p-6">
+    <aside className="fixed overflow-y-auto inset-y-0 left-0 w-56 bg-white shadow-md">
+      <div className="p-4">
         <h1 className="text-xl font-bold mb-6">BankAdmin</h1>
         <nav className="space-y-2">
           {currentLink.map(({ path, label, icon: Icon }) => (

@@ -4,12 +4,16 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // localStorage
 import { microfinanceApi } from "../feature/microfinance/microfinanceApi";
 import { licenceApi } from "../feature/licence/licenceApi";
+import { userLicenceApi } from "../feature/userLicence/userLicenceApi";
+import { authApi } from "../feature/auth/authApi";
 
 
 const rootReducer = combineReducers({
     user: UserSlice,
     [microfinanceApi.reducerPath]:microfinanceApi.reducer,
-    [licenceApi.reducerPath]:licenceApi.reducer
+    [licenceApi.reducerPath]:licenceApi.reducer,
+    [userLicenceApi.reducerPath]:userLicenceApi.reducer,
+    [authApi.reducerPath]:authApi.reducer
 });
 
 const persistConfig = {
@@ -25,7 +29,9 @@ export const store = configureStore({
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(
           microfinanceApi.middleware,
-          licenceApi.middleware
+          licenceApi.middleware,
+          userLicenceApi.middleware,
+          authApi.middleware
         )
 })
 store.dispatch(loadTokenFromStorage())

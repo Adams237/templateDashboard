@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { formaNumber } from '../../utils/feature/utils';
 import { useGetAllMicrofinanceQuery } from '../../utils/feature/microfinance/microfinanceApi';
+import { format } from 'date-fns';
 
 const ClientDashboard = () => {
   const { t } = useTranslation()
@@ -46,15 +47,16 @@ const ClientDashboard = () => {
     averageSuccess: (MICROFINANCES.filter(c => c.status === 'active').length / MICROFINANCES.length) * 100
   };
 
-  if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500' /></div>
+  if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500 animate-spin' /></div>
   if (error) {
     console.log(error)
     return <div className='flex items-center justify-center text-red-500 font-bold text-xl'>{t("load_error")}</div>
   }
 
-  console.log(microfinance)
+  // console.log(microfinance?.meta.total_pages)
+  console.log("filteredClients", filteredClients)
   return (
-    <div className="  space-y-6">
+    <div className="w-full space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <Card.Body>
@@ -122,9 +124,9 @@ const ClientDashboard = () => {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <option value="all">Tous les statuts</option>
-              <option value="ACTIVE">Actifs</option>
-              <option value="INACTIVE">Inactifs</option>
+              <option value="all">{t("microfinace.all")}</option>
+              <option value="ACTIVE">{t("microfinace.actifs")}</option>
+              <option value="INACTIVE">{t("microfinace.inactif")}</option>
             </select>
           </div>
 
@@ -133,32 +135,32 @@ const ClientDashboard = () => {
             onClick={() => navigate("/new-microfinance")}
             icon={<Newspaper size={16} />}
           >
-            Nouvelle microfinance
+            {t("microfinace.new_micro")}
           </Button>
         </div>
       </div>
 
 
-      <div>
+      <div className='w-[78vw] overflow-x-auto'>
         <Table>
           <Table.Head>
             <Table.Row>
-              <Table.HeadCell>Client</Table.HeadCell>
-              <Table.HeadCell>Statut</Table.HeadCell>
-              <Table.HeadCell>Email</Table.HeadCell>
-              <Table.HeadCell>Phone</Table.HeadCell>
-              <Table.HeadCell>Adresse</Table.HeadCell>
-              <Table.HeadCell>Date de creation</Table.HeadCell>
+              <Table.HeadCell>{t("microfinace.name")}</Table.HeadCell>
+              <Table.HeadCell>{t("microfinace.status")}</Table.HeadCell>
+              <Table.HeadCell>{t("microfinace.email")}</Table.HeadCell>
+              <Table.HeadCell>{t("microfinace.phone_number")}</Table.HeadCell>
+              <Table.HeadCell>{t("microfinace.address")}</Table.HeadCell>
+              <Table.HeadCell>{t("microfinace.date")}</Table.HeadCell>
               <Table.HeadCell>Actions</Table.HeadCell>
             </Table.Row>
           </Table.Head>
           <Table.Body>
-            {filteredClients?.slice(page, limit).map((client) => (
+            {filteredClients?.map((client) => (
               <Table.Row key={client.updated_at}>
                 <Table.Cell>
                   <div className="flex items-center">
                     <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-200 flex items-center justify-center">
-                      {client.profile_picture ? <img src={client.profile_picture} alt="" /> :
+                      {client.profile_picture ? <img className='w-10 h-10 rounded-full' src={client.profile_picture} alt="" /> :
                         client.name.charAt(0)}
                     </div>
                     <div className="ml-4">
@@ -187,7 +189,7 @@ const ClientDashboard = () => {
                   <div>{client.city}</div>
                 </Table.Cell>
                 <Table.Cell>
-                  <div>{client.created_at}</div>
+                  <div>{format(new Date(client.created_at), 'dd/MM/yyyy HH:mm')}</div>
                 </Table.Cell>
                 <Table.Cell>
                   <Button
@@ -212,13 +214,13 @@ const ClientDashboard = () => {
           </button>
 
           <span>
-            Page {microfinance?.meta.page} sur {microfinance?.meta.totalPages}
+            Page {microfinance?.meta.page} sur {microfinance?.meta.total_pages}
             {isFetching && ' …'}
           </span>
 
           <button
-            onClick={() => setPage((p) => Math.min(p + 1, microfinance?.meta.totalPages ?? 1))}
-            disabled={page === (microfinance?.meta.totalPages ?? 1) || isFetching}
+            onClick={() => setPage((p) => Math.min(p + 1, microfinance?.meta.total_pages ?? 1))}
+            disabled={page === (microfinance?.meta.total_pages ?? 1) || isFetching}
             className="px-3 py-1 border rounded disabled:opacity-50"
           >
             {t("next")} ›

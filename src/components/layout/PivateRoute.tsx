@@ -11,7 +11,7 @@ interface RootState {
 
 function PivateRoute() {
     const currentUser = useSelector((state: RootState) => state.user.value[0]);
-    console.log(currentUser)
+    // console.log(currentUser)
   return currentUser? <Outlet/>:<Navigate to={"/login"} replace/>
 }
 

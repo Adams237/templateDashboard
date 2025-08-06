@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { formaNumber } from '../../utils/feature/utils';
 import Button from '../../components/ui/Button';
-import { Loader, Loader2, Newspaper, Trash, Upload } from 'lucide-react';
+import { Edit, Loader, Loader2, Newspaper, Trash } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Modal from '../../components/Modal/Modal';
 import NewLicence from './NewLicence';
@@ -33,8 +33,8 @@ export default function LicencePage() {
       toast.error(i18n.language === "fr" ? error.data.message : error.data.messageE)
     }
   }
-
-  if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500' /></div>
+  // console.log(licences)
+  if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500 animate-spin' /></div>
   if (error) {
     console.log(error)
     return <div className='flex items-center justify-center text-red-500 font-bold text-xl'>{t("load_error")}</div>
@@ -71,9 +71,9 @@ export default function LicencePage() {
                 <div className="text-sm font-medium text-gray-900">{request.name}</div>
                 <div className="text-sm text-gray-500">ID: {request.plan_id}</div>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.max_users}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.max_transactions}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formaNumber(request.monthly_price)} FCFA</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formaNumber(Number(request.max_users))}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formaNumber(Number(request.max_transactions))}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formaNumber(Number(request.monthly_price))} FCFA</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.number_of_months} </td>
 
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -81,15 +81,15 @@ export default function LicencePage() {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <div className=' flex items-center justify-between flex-row'>
-                  <span onClick={()=>{
+                  <span onClick={() => {
                     setIsOpen2(true)
                     setLicenceSelected(request)
                   }}>
-                    <Upload className=' text-green-400 w-5 h-5 hover:text-green-600 cursor-pointer' />
+                    <Edit className=' text-yellow-400 w-5 h-5 hover:text-yellow-600 cursor-pointer' />
                   </span>
 
-                  <span onClick={() => handleDelete(request.plan_id)} >
-                    {load ? <Loader2 /> : <Trash className=' text-red-400   w-5 h-5 hover:text-red-600 cursor-pointer' />}
+                  <span onClick={() => handleDelete(request.plan_id.toString())} >
+                    {load ? <Loader2 className='animate-spin' /> : <Trash className=' text-red-400   w-5 h-5 hover:text-red-600 cursor-pointer' />}
                   </span>
                 </div>
 
@@ -108,13 +108,13 @@ export default function LicencePage() {
         </button>
 
         <span>
-          Page {licences?.meta.page} sur {licences?.meta.totalPages}
+          Page {licences?.meta.page} sur {licences?.meta.total_pages}
           {isFetching && ' …'}
         </span>
 
         <button
-          onClick={() => setPage((p) => Math.min(p + 1, licences?.meta.totalPages ?? 1))}
-          disabled={page === (licences?.meta.totalPages ?? 1) || isFetching}
+          onClick={() => setPage((p) => Math.min(p + 1, licences?.meta.total_pages ?? 1))}
+          disabled={page === (licences?.meta.total_pages ?? 1) || isFetching}
           className="px-3 py-1 border rounded disabled:opacity-50"
         >
           {t("next")} ›
@@ -136,7 +136,7 @@ export default function LicencePage() {
         title={t("package.update")}
       >
         <div>
-          { licenceSelected && <UpdateLicence licence={licenceSelected} />}
+          {licenceSelected && <UpdateLicence onClose={() => setIsOpen2(false)} licence={licenceSelected} />}
         </div>
 
       </Modal>

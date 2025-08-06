@@ -1,32 +1,51 @@
-import React, { useState } from 'react';
-import { Search, Filter,  Users, TrendingUp, AlertTriangle, } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Search, Filter, Users, TrendingUp, AlertTriangle, Loader, Ban, Rocket, Loader2, } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { USERLICENCE } from '../data/user_licence';
 import Card from '../components/ui/Card';
 import { formaNumber } from '../utils/feature/utils';
-import Button from '../components/ui/Button';
 import Table from '../components/ui/Table';
 import { getStatusColor } from '../data/mockClients';
 import Badge from '../components/ui/Badge';
+import { useLazyGetAllUserLicencesQuery, useUpdateStatusMutation } from '../utils/feature/userLicence/userLicenceApi';
+import { format } from 'date-fns';
+import { toast } from 'react-toastify';
 
 const UserLicencePage = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [lang, setLang] = useState<"fr" | "en">(i18n.language === "fr" ? "fr" : "en")
+  const [statusFilter, setStatusFilter] = useState<"ACTIVE" | "EXPIRED" | "SUSPENDED" | "all">('all');
+
   const [page, setPage] = useState(1)
   const limit = 10
+  const [fetchLicences, { data: lazyData, isLoading, isFetching, error }] = useLazyGetAllUserLicencesQuery();
+  const [update, { isLoading: load }] = useUpdateStatusMutation()
 
-  const navigate = useNavigate()
+  useEffect(() => {
+    setLang(i18n.language === "fr" ? "fr" : "en")
+  }, [i18n.language])
 
-  const filteredClients = USERLICENCE.filter(client => {
+  useEffect(() => {
+    fetchLicences({
+      page,
+      limit,
+      lang: lang,
+      // si votre API accepte un filtre status :
+      license_status: statusFilter !== 'all' ? statusFilter : undefined,
+    });
+  }, [statusFilter, lang, page, i18n.language, fetchLicences]);
+
+  // 3) On travaille sur lazyData au lieu de userLicences
+  const userLicences = lazyData;
+  const filteredClients = userLicences?.data.filter(client => {
     if (statusFilter !== 'all' && client.license_status !== statusFilter) return false;
 
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       return (
         client.user.name.toLowerCase().includes(searchLower) ||
-        client.plan.name.toLowerCase().includes(searchLower) 
+        client.plan.name.toLowerCase().includes(searchLower)
       );
     }
 
@@ -35,11 +54,27 @@ const UserLicencePage = () => {
 
   // Calculate summary statistics
   const summaryStats = {
-    totalClients: USERLICENCE.length,
-    activeClients: USERLICENCE.filter(c => c.license_status.toLowerCase() === 'active').length,
+    totalClients: userLicences?.meta.total,
+    activeClients: userLicences?.data.filter(c => c.license_status.toLowerCase() === 'active').length,
     averageSuccess: (USERLICENCE.filter(c => c.license_status.toLowerCase() === 'active').length / USERLICENCE.length) * 100
   };
 
+  const updateStatus = async (id: string, status: "ACTIVE" | "EXPIRED" | "SUSPENDED") => {
+    try {
+      await update({ id, lang, status }).unwrap()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error)
+      toast.error(error.data.message)
+    }
+  }
+
+
+  if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500' /></div>
+  if (error) {
+    console.log(error)
+    return <div className='flex items-center justify-center text-red-500 font-bold text-xl'>{t("load_error")}</div>
+  }
 
   return (
     <div className="  space-y-6">
@@ -49,7 +84,7 @@ const UserLicencePage = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">{t("licence.client_actif")}</p>
-                <p className="text-2xl font-semibold">{formaNumber(summaryStats.activeClients)}</p>
+                <p className="text-2xl font-semibold">{formaNumber(summaryStats.activeClients ?? 0)}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
                 <Users size={24} className="text-blue-600" />
@@ -63,7 +98,7 @@ const UserLicencePage = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">{t("licence.all_client")}</p>
-                <p className="text-2xl font-semibold">{formaNumber(summaryStats.totalClients)}</p>
+                <p className="text-2xl font-semibold">{formaNumber(summaryStats.totalClients ?? 0)}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
                 <TrendingUp size={24} className="text-green-600" />
@@ -108,7 +143,7 @@ const UserLicencePage = () => {
             <select
               className="block rounded-md h-9 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => setStatusFilter(e.target.value as "ACTIVE" | "EXPIRED" | "SUSPENDED" | "all")}
             >
               <option value="all">{t("licence.all_status")}</option>
               <option value="ACTIVE">{t("licence.actif")}</option>
@@ -117,13 +152,7 @@ const UserLicencePage = () => {
             </select>
           </div>
 
-          {/* <Button
-            variant="primary"
-            onClick={()=>navigate("/new-microfinance")}
-            icon={<Newspaper size={16} />}
-          >
-            Nouvelle microfinance
-          </Button> */}
+
         </div>
       </div>
 
@@ -135,17 +164,18 @@ const UserLicencePage = () => {
               <Table.HeadCell>{t("licence.microfinance")}</Table.HeadCell>
               <Table.HeadCell>{t("licence.status")}</Table.HeadCell>
               <Table.HeadCell>{t("licence.create_at")}</Table.HeadCell>
+              <Table.HeadCell>{t("licence.expired_at")}</Table.HeadCell>
               <Table.HeadCell>{t("licence.licence")}</Table.HeadCell>
               <Table.HeadCell>Actions</Table.HeadCell>
             </Table.Row>
           </Table.Head>
           <Table.Body>
-            {filteredClients.map((client) => (
+            {filteredClients?.map((client) => (
               <Table.Row key={client.tenant_license_id}>
                 <Table.Cell>
-                      {client.user.name}
-                        
-                 
+                  {client.user.name}
+
+
                 </Table.Cell>
 
                 <Table.Cell>
@@ -156,19 +186,28 @@ const UserLicencePage = () => {
                   </Badge>
                 </Table.Cell>
                 <Table.Cell>
-                  <div>{client.created_at}</div>
+                  <div>{format(new Date(client.created_at), 'dd/MM/yyyy HH:mm')}</div>
+                </Table.Cell>
+                <Table.Cell>
+                  <div>{format(new Date(client.license_expires), 'dd/MM/yyyy HH:mm')}</div>
                 </Table.Cell>
                 <Table.Cell>
                   <div>{client.plan.name}</div>
                 </Table.Cell>
                 <Table.Cell>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => navigate(`/clients/${client.tenant_license_id}`)}
-                  >
-                    Détails
-                  </Button>
+                  <div>
+                    {
+                      client.license_status === "ACTIVE" ?
+                        <span onClick={() => updateStatus(client.tenant_license_id, "SUSPENDED")} className='w-6 h-6 text-red-500 hover:text-red-600 cursor-pointer' >
+                          {load ? <Loader2 /> : <Ban />}
+                        </span> :
+                        <span onClick={() => updateStatus(client.tenant_license_id, "ACTIVE")} className='w-6 h-6 text-green-500 hover:text-green-600 cursor-pointer'>
+                          {load ? <Loader2 /> : <Rocket />}
+                        </span>
+                    }
+                  </div>
+
+
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -177,22 +216,23 @@ const UserLicencePage = () => {
         <div className="flex items-center justify-between mt-4">
           <button
             onClick={() => setPage((p) => Math.max(p - 1, 1))}
-            disabled={page === 1}
+            disabled={page === 1 || isFetching}
             className="px-3 py-1 border rounded disabled:opacity-50"
           >
-            ‹ {t("zone.preavu")}
+            ‹ {t("preavu")}
           </button>
 
           <span>
-            Page {page} sur {summaryStats.totalClients / limit}
+            Page {userLicences?.meta.page} sur {userLicences?.meta.totalPages}
+            {isFetching && ' …'}
           </span>
 
           <button
-            onClick={() => setPage((p) => Math.min(p + 1, limit ?? 1))}
-            disabled={page === (limit ?? 1)}
+            onClick={() => setPage((p) => Math.min(p + 1, userLicences?.meta.totalPages ?? 1))}
+            disabled={page === (userLicences?.meta.totalPages ?? 1) || isFetching}
             className="px-3 py-1 border rounded disabled:opacity-50"
           >
-            {t("zone.next")} ›
+            {t("next")} ›
           </button>
         </div>
       </div>

@@ -7,9 +7,10 @@ import UpdateLicenceForm from '../../components/forms/UpdateLicenceForm'
 
 interface UpdateProps{
     licence:LicenceResponse
+    onClose:()=>void
 }
 
-function UpdateLicence({licence}:UpdateProps) {
+function UpdateLicence({licence,onClose}:UpdateProps) {
   const { t, i18n } = useTranslation()
   const [create] = useUpdateLicenceMutation()
   const handleCreate = async (data: LicenceResponse) => {
@@ -22,8 +23,9 @@ function UpdateLicence({licence}:UpdateProps) {
         number_of_months :Number(data.number_of_months), 
         monthly_price:Number(data.monthly_price)
       }
-      await create({id:data.plan_id,credential: newData}).unwrap()
+      await create({id:data.plan_id.toString(),credential: newData}).unwrap()
       toast.success(t("package.success_update"))
+      onClose()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error)

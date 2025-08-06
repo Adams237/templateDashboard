@@ -3,19 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import LoginForm from '../components/forms/Logiform';
+import { useLoginMutation } from '../utils/feature/auth/authApi';
+import { LoginRequest } from '../utils/feature/auth/type';
 
 
 
 
 function LoginPage() {
     const {i18n} = useTranslation()
+    const [login,] = useLoginMutation()
     const navigate = useNavigate()
-    const handleLogin = async (data: { phone_number: string; password: string }) => {
+    const handleLogin = async (data: LoginRequest) => {
 
         try {
-            
-            console.log()
-            navigate("/verify-otp",{state:data.phone_number})
+            const response = await login({user:data, lang:i18n.language}).unwrap()
+            navigate("/verify-otp",{state:{response,email:data.email}})
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error:any) {
             toast.error( i18n.language === "fr"? error.data.message: error.data.messageE)

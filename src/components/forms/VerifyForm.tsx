@@ -5,15 +5,19 @@ import { toast } from 'react-toastify'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { logIn } from '../../utils/redux/slice/user.slice'
+import { useVerifyOtpMutation } from '../../utils/feature/auth/authApi'
+import { Loader2 } from 'lucide-react'
 
 interface VerifyFormProps {
-  phone_number: string
+
+  email: string
 }
 
-export const VerifyForm = ({ phone_number }: VerifyFormProps) => {
+export const VerifyForm = ({ email }: VerifyFormProps) => {
   const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [verifyOtp, { isLoading: isSubmitting }] = useVerifyOtpMutation()
   // État : tableau de 4 strings (chiffres)
   const [code, setCode] = useState<string[]>(['', '', '', '', '', ''])
   // Réfs pour chaque input pour gérer le focus
@@ -56,19 +60,10 @@ export const VerifyForm = ({ phone_number }: VerifyFormProps) => {
       return
     }
     try {
+      const response = await verifyOtp({ email, otp, lang: i18n.language }).unwrap()
       dispatch(logIn({
-        user: {
-          user_id: "1213132",
-          name: "Nsangou",
-          email: "nsangouadamsdev@gmail.com",
-          phone_number: phone_number,
-          profile_picture: "https://img.freepik.com/vecteurs-libre/cercle-bleu-utilisateur-blanc_78370-4707.jpg?w=360",
-          status: "activate",
-          created_at: "",
-          updated_at: "",
-        },
-        token:";klsuibwefiweflhusdnfmweofi;vjwdlewfn"
-
+        user: response.user_id,
+        token: response.access_token
       }))
       navigate("/")
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -109,7 +104,7 @@ export const VerifyForm = ({ phone_number }: VerifyFormProps) => {
           type="submit"
           className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
         >
-          {t("auth.verify_buttom")}
+          {isSubmitting ? <Loader2 className='animate-spin w-4 h-4'/> : t("auth.verify_buttom")}
         </button>
       </form>
     </div>

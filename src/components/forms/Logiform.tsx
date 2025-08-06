@@ -3,11 +3,12 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import logo from "../../assets/images/logo_collect_black.png"
+import { Loader2 } from 'lucide-react'
 
 // 1. Définition des données du formulaire
 interface LoginFormData {
-  phone_number: string
-  password: string
+  email: string
+  password_hash: string
 }
 
 interface LoginFormProps {
@@ -15,7 +16,7 @@ interface LoginFormProps {
 }
 
 // Regex pour numéro camerounais
-const phoneRegex = /^(?:\+237|0)6[0-9]{8}$/
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
   const { t } = useTranslation()
@@ -40,27 +41,27 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
 
       {/* Téléphone */}
       <div>
-        <label htmlFor="phone_number" className="block text-sm font-medium mb-1">
-          {t("auth.phone_number")}
+        <label htmlFor="email" className="block text-sm font-medium mb-1">
+          {t("auth.email")}
         </label>
         <input
-          id="phone_number"
+          id="email"
           type="text"
-          {...register('phone_number', {
-            required: "Le numéro de téléphone est requis",
+          {...register('email', {
+            required: "L'email est requis",
             pattern: {
-              value: phoneRegex,
-              message: "Numéro camerounais invalide (doit commencer par +2376xxxxxxx ou 06xxxxxxx)"
+              value: emailRegex,
+              message: "Email invalide"
             }
           })}
-          className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.phone_number
+          className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.email
             ? 'border-red-500 focus:ring-red-300'
             : 'border-gray-300 focus:ring-blue-300'
           }`}
         />
-        {errors.phone_number && (
+        {errors.email && (
           <p className="mt-1 text-sm text-red-600">
-            {errors.phone_number.message}
+            {errors.email.message}
           </p>
         )}
       </div>
@@ -73,18 +74,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
         <input
           id="password"
           type="password"
-          {...register('password', {
+          {...register('password_hash', {
             required: "Le mot de passe est requis",
             minLength: { value: 4, message: "Au moins 4 caractères" }
           })}
-          className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.password
+          className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.password_hash
             ? 'border-red-500 focus:ring-red-300'
             : 'border-gray-300 focus:ring-blue-300'
           }`}
         />
-        {errors.password && (
+        {errors.password_hash && (
           <p className="mt-1 text-sm text-red-600">
-            {errors.password.message}
+            {errors.password_hash.message}
           </p>
         )}
       </div>
@@ -93,9 +94,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
+        className="w-full py-2 bg-blue-600 flex items-center justify-center gap-2 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
       >
-        {isSubmitting ? t("auth.logging_in") : t("auth.login")}
+        {isSubmitting ? <Loader2 className='animate-spin w-4 h-4'/> : t("auth.login")}
       </button>
     </form>
   )

@@ -13,7 +13,7 @@ function Layout() {
     return (
         <div className="flex">
             <Sidebar user={currentUser} />
-            <main className="flex-1 p-6 bg-gray-100 ml-64">
+            <main className="flex-1 p-6 bg-gray-100 ml-52">
                 <Header />
                 {/* c’est ici que vont s’insérer les pages (DashboardPage, etc.) */}
                 <Outlet />

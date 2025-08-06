@@ -12,7 +12,13 @@
     "document_type":"Type du document",
     "document_number":"Numero d'identification du document",
     "file":"Image du document",
-    "submit":"Creer"
+    "submit":"Creer",
+    "all":"Tous les statuts",
+    "actifs":"Actifs",
+    "inactif":"Inactifs",
+    "new_micro":" Nouvelle microfinance",
+    "status":"Statut",
+    "date":"Date creation"
   },
   "package":{
     "title":"Liste des Licences Disponible",
@@ -28,7 +34,29 @@
     "actions":"Actions",
     "success_deleted":"Suppression effectuer avec success",
     "update":"Mettre a jour la licence",
-    "success_update":"Licence Mise a jour avec success"
+    "success_update":"Licence Mise a jour avec success",
+    "color":"Couleur",
+    "popular":"Populaire",
+    "color_required":"La couleur est requise",
+    "popular_required":"Le popular est requise",
+    "features":"Caracteristiques",
+    "limitations":"Limitations",
+    "features_en":"Caracteristiques en anglais",
+    "limitations_en":"Limitations en anglais",
+    "features_required":"Les caracteristiques sont requises",
+    "limitations_required":"Les limitations sont requises",
+    "features_en_required":"Les caracteristiques en anglais sont requises",
+    "limitations_en_required":"Les limitations en anglais sont requises",
+    "add_feature":"Ajouter une caracteristique",
+    "add_feature_en":"Ajouter une caracteristique en anglais",
+    "add_limitations":"Ajouter une limitation",
+    "add_limitations_en":"Ajouter une limitation en anglais",
+    "description_en":"Description en anglais",
+    "description_required":"La description est requise",
+    "description_en_required":"La description en anglais est requise",
+    "popular_true":"Oui",
+    "popular_false":"Non",
+    "description":"Description"
   },
   "licence":{
     "client_actif":"Clients actifs",
@@ -42,15 +70,23 @@
     "microfinance":"Nom de la microfinance",
     "status":"Statut",
     "create_at":"Date de creation",
-    "licence":"Licence"
+    "licence":"Licence",
+    "expired_at":"Date d'expiration"
   },
   "auth":{
     "login":"Connexion",
     "phone_number":"Numero de telephone",
     "password":"Mot de passe",
-    "verify":"Verifier le numero de telephone",
-    "enter_otp_code":"Entrer le code envoye a votre numero par sms",
-    "verify_buttom":"Verifier"
+    "verify":"Verifier l'email",
+    "enter_otp_code":"Entrer le code envoye a votre email",
+    "verify_buttom":"Verifier",
+    "email":"Email",
+    "email_required":"L'email est requise",
+    "email_invalid":"L'email est invalide",
+    "password_required":"Le mot de passe est requise",
+    "password_invalid":"Le mot de passe est invalide",
+    "password_min_length":"Le mot de passe doit contenir au moins 4 caracteres",
+    "logging_in":"Connexion en cours"
   },
   "load_error":"Erreur lors du chargement",
   "next":"Suivant",

@@ -51,7 +51,7 @@ const ClientDetailsModal = () => {
     { id: 'location', label: 'Localisation' },
   ];
 
-  if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500' /></div>
+  if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500 animate-spin' /></div>
   if (error) return <div className='flex items-center justify-center text-red-500 font-bold text-xl'>{t("load_error")}</div>
   if (!client) return null;
   console.log(client)

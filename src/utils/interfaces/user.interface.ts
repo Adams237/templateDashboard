@@ -41,6 +41,7 @@ export interface pagination<T> {
         page: number,
         totalPages: number,
         perPage: number,
+        total_pages:number,
         total: number
     }
 }
