@@ -49,7 +49,7 @@
     "mois": "month",
     "error_licence_api": "Select a package",
     "license_upadte": "License added successfully",
-     "user_mincr":"The number of users of this microfinance is "
+     "user_mincr":"Users "
   },
   "package": {
     "title": "List of available licenses",
@@ -117,6 +117,25 @@
     "verify": "Verify the email",
     "enter_otp_code": "Enter the code sent to your email",
     "verify_buttom": "Verify"
+  },
+  "settings":{
+    "info_perso":"Personal information",
+    "last_login":"Last login",
+    "name":"First and last name",
+    "email":"Email",
+    "phone":"Phone",
+    "country":"Country",
+    "city":"City",
+    "address":"Address",
+    "update_password":"Update your password",
+    "old_password":"Old Password",
+    "old_password_required":"Old password is required",
+    "new_password_required":"Enter the new password",
+    "new_password":"New Password",
+    "updated_password":"Update password",
+    "update":"Update your information",
+    "unpdate_success":"Update successful",
+    "update_inf":"Update"
   },
   "load_error": "Error loading",
   "next": "Next",

@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { MapPin, Phone, Mail, FileText, AlertTriangle, TrendingUp, User, Loader, Eye, } from 'lucide-react';
+import { MapPin, Phone, Mail, FileText, AlertTriangle, Loader, Eye, Edit, } from 'lucide-react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import Badge from '../ui/Badge';
 import Card from '../ui/Card';
 import Table from '../ui/Table';
 import { getStatusColor } from '../../data/mockClients';
-import { MICROFINANCES } from '../../data/microfinance';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import { formaNumber } from '../../utils/feature/utils';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useGetMicrofinanceByIdQuery } from '../../utils/feature/microfinance/microfinanceApi';
 import Button from '../ui/Button';
 import Modal from '../Modal/Modal';
@@ -16,7 +14,9 @@ import NewTenantLicense from '../forms/NewTenantLicense';
 import { ToastContainer } from 'react-toastify';
 import { DocumenetResponse } from '../../utils/feature/document/type';
 import Metrick from './Metrick';
-
+import { motion } from 'framer-motion';
+import UpdateDocument from './UpdateDocument';
+import AddDocument from './AddDocument';
 
 
 const mapContainerStyle = {
@@ -42,27 +42,24 @@ const ClientDetailsModal = () => {
   const [openCreateLicense, setOpenCreateLicense] = useState(false)
   const { data: client, isLoading, error } = useGetMicrofinanceByIdQuery(clientId)
   const [document, setDocument] = useState<DocumenetResponse | null>(null)
+  const navigate = useNavigate()
+  const [updateDocument, setUpdateDocument] = useState<DocumenetResponse | null>()
 
-  // console.log(client)
-  // Move useEffect outside of conditional rendering
+  const [openEdit, setIsOpenEdit] = useState(false)
+  const [openAddDoc, setOppenAddDoc] = useState(false)
 
 
 
   const tabs = [
     { id: 'overview', label: 'Aperçu' },
-    // { id: 'transactions', label: 'Transactions' },
-    // { id: 'schedule', label: 'Planning collectes' },
     { id: 'documents', label: 'Documents' },
-    // { id: 'activities', label: 'Activités' },
-    // { id: 'location', label: 'Localisation' },
     { id: 'tenant_licence', label: 'Licences' },
-    { id: 'metrick', label: 'Utilisateurs' },
+    // { id: 'metrick', label: 'Utilisateurs' },
   ];
 
   if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500 animate-spin' /></div>
   if (error) return <div className='flex items-center justify-center text-red-500 font-bold text-xl'>{t("load_error")}</div>
   if (!client) return null;
-  console.log(client)
   const create_at = new Date(client.created_at)
   return (
 
@@ -70,10 +67,13 @@ const ClientDetailsModal = () => {
       {/* Client Header Info */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">
-
-            <span className="text-gray-500 text-sm">{t("microfinace.name")}:</span> {client.name}
-          </h2>
+          <div className=' flex flex-row items-center'>
+            <img className='w-[50px] h-[50px] rounded-full mr-2' src={client?.profile_picture} />
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">{client?.name}</h2>
+              <p className='font-[100] text-gray-400 ' >{client?.email}</p>
+            </div>
+          </div>
           <div className="mt-1 flex items-center space-x-2">
             <Badge variant={getStatusColor(client.status.toLowerCase())}>
               {client.status.toLowerCase() === 'active' ? t("licence.actif") :
@@ -90,7 +90,7 @@ const ClientDetailsModal = () => {
         </div>
       </div>
       <div className='flex items-center gap-2 justify-end' >
-        <Button variant='outline'>
+        <Button onClick={() => navigate(`/clients/update/${clientId}`, { state: client })} variant='outline'>
           {t("microfinace.update_client")}
         </Button>
         {
@@ -220,51 +220,13 @@ const ClientDetailsModal = () => {
 
             {/* Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <Card.Body>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">Total Transaction</p>
-                      <p className="text-2xl font-semibold">
-                        {formaNumber(MICROFINANCES.length)}
-                      </p>
-                    </div>
-                    <div className="p-3 bg-blue-100 rounded-full">
-                      <TrendingUp size={24} className="text-blue-600" />
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
 
               <Card>
                 <Card.Body>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">Total client</p>
-                      <p className="text-2xl font-semibold">
-                        {formaNumber(MICROFINANCES.length)}
-                      </p>
-                    </div>
-                    <div className="p-3 bg-green-100 rounded-full">
-                      <User size={24} className="text-green-600" />
-                    </div>
-                  </div>
+                  <Metrick />
                 </Card.Body>
-              </Card>
-              <Card>
-                <Card.Body>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">Total Collecteur</p>
-                      <p className="text-2xl font-semibold">
-                        {formaNumber(MICROFINANCES.length)}
-                      </p>
-                    </div>
-                    <div className="p-3 bg-gray-100 rounded-full">
-                      <AlertTriangle size={24} className="text-gray-600" />
-                    </div>
-                  </div>
-                </Card.Body>
+
+
               </Card>
 
 
@@ -280,7 +242,7 @@ const ClientDetailsModal = () => {
                     <p className="font-medium">{client.address}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Coordonnee geogrqphique</p>
+                    <p className="text-sm text-gray-500">Coordonnee geographique</p>
                     <div className="flex flex-wrap gap-2 mt-1">
                       <Badge variant="secondary">
                         {client.latitude}
@@ -302,20 +264,24 @@ const ClientDetailsModal = () => {
 
         {activeTab === 'documents' && (
           <div className="space-y-4">
+            <div className='flex flex-row items-end justify-end' >
+              <Button onClick={() => setOppenAddDoc(true)} >
+                {t("microfinace.create_document")}
+              </Button>
+            </div>
             <Table>
               <Table.Head>
                 <Table.Row>
-                  <Table.HeadCell>Type</Table.HeadCell>
-                  <Table.HeadCell>Numéro</Table.HeadCell>
-                  <Table.HeadCell>Date d'émission</Table.HeadCell>
-                  <Table.HeadCell>Date d'expiration</Table.HeadCell>
-                  <Table.HeadCell>Statut</Table.HeadCell>
+                  <Table.HeadCell>{t("microfinace.document_type")}</Table.HeadCell>
+                  <Table.HeadCell>{t("microfinace.document_number")}</Table.HeadCell>
+                  <Table.HeadCell>{t("microfinace.create_at")}</Table.HeadCell>
+                  {/* <Table.HeadCell>Date d'expiration</Table.HeadCell> */}
+                  <Table.HeadCell>Action</Table.HeadCell>
                 </Table.Row>
               </Table.Head>
               <Table.Body>
                 {client.Documents?.map((document, index) => {
                   const date_delivrance = new Date(document.created_at)
-                  const date_expire = new Date(document.updated_at)
                   return <Table.Row key={index}>
                     <Table.Cell>
                       <div className="flex items-center">
@@ -327,8 +293,20 @@ const ClientDetailsModal = () => {
                     </Table.Cell>
                     <Table.Cell>{document.document_number}</Table.Cell>
                     <Table.Cell>{date_delivrance.toLocaleDateString()}</Table.Cell>
-                    <Table.Cell>{date_expire.toLocaleDateString()}</Table.Cell>
-                    <Table.Cell className='cursor-pointer'><span onClick={() => setDocument(document)} ><Eye /></span></Table.Cell>
+                    {/* <Table.Cell>{date_expire.toLocaleDateString()}</Table.Cell> */}
+                    <Table.Cell className='cursor-pointer'>
+                      <div className='flex flex-row items-center justify-around' >
+                        <span onClick={() => setDocument(document)} ><Eye /></span>
+                        <motion.button onClick={() => {
+                          // setDocument(document)
+                          setUpdateDocument(document)
+                          setIsOpenEdit(true)
+                        }} whileHover={{ scale: 1.1 }} className="text-yellow-600 hover:text-yellow-800">
+                          <Edit className="h-5 w-5" />
+                        </motion.button>
+                      </div>
+
+                    </Table.Cell>
 
                   </Table.Row>
                 })}
@@ -350,7 +328,7 @@ const ClientDetailsModal = () => {
                   <Table.HeadCell>Statut</Table.HeadCell>
                   <Table.HeadCell>Date de creation</Table.HeadCell>
                   <Table.HeadCell>Date d'expiration</Table.HeadCell>
-                  <Table.HeadCell>Statut</Table.HeadCell>
+                  {/* <Table.HeadCell>Statut</Table.HeadCell> */}
                 </Table.Row>
               </Table.Head>
               <Table.Body>
@@ -366,10 +344,12 @@ const ClientDetailsModal = () => {
                         </span>
                       </div>
                     </Table.Cell>
-                    <Table.Cell>{licence.license_status}</Table.Cell>
+                    <Table.Cell>
+                      {licence.license_status}
+                    </Table.Cell>
                     <Table.Cell>{date_delivrance.toLocaleDateString()}</Table.Cell>
                     <Table.Cell>{date_expire.toLocaleDateString()}</Table.Cell>
-                    <Table.Cell className='cursor-pointer'><Eye /></Table.Cell>
+                    {/* <Table.Cell className='cursor-pointer'><Eye /></Table.Cell> */}
 
                   </Table.Row>
                 })}
@@ -388,6 +368,12 @@ const ClientDetailsModal = () => {
       </div>
       <Modal isOpen={openCreateLicense} onClose={() => setOpenCreateLicense(false)} title={t("microfinace.new_licence")}>
         <NewTenantLicense onClose={() => setOpenCreateLicense(false)} />
+      </Modal>
+      <Modal isOpen={openEdit} onClose={() => setIsOpenEdit(false)} title={t("microfinace.edit_document")}>
+        {updateDocument && <UpdateDocument updateDocument={updateDocument} setUpdateDocument={setUpdateDocument} />}
+      </Modal>
+      <Modal isOpen={openAddDoc} onClose={()=>setOppenAddDoc(false)} title={t("microfinace.edit_document")} >
+        <AddDocument/>
       </Modal>
       <ToastContainer
         position="top-right"

@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react"
 import { baseQueryPrivate } from "../../redux/baseUrl"
 import { MetrickResponse, MicrofinanceResponse, MicrofinanceResquest } from "./type"
 import { pagination } from "../../interfaces/user.interface"
+import { DocumenetRequest, DocumenetResponse } from "../document/type"
 
 export const microfinanceApi = createApi({
     reducerPath:"microfinanceApi",
@@ -69,6 +70,50 @@ export const microfinanceApi = createApi({
                     month :month 
                 }
             })
+        }),
+        updateMicorfinance: builder.mutation<{ success: boolean }, MicrofinanceResponse>({
+            query: (user) => ({
+                url: `/users/${user.user_id}`,
+                method: "PUT",
+                body: {
+                    name: user.name,
+                    email: user.email,
+                    password_hash: user.password_hash,
+                    phone_number: user.phone_number,
+                    profile_picture: user.profile_picture,
+                    address: user.address,
+                    city: user.city,
+                    country: user.country,
+                    apiUrl:user.apiUrl,
+                    // documents: [...user.Documents]
+                }
+            }),
+            invalidatesTags: ['microfinances']
+        }),
+        updateDocument:builder.mutation<{success:boolean}, {document:DocumenetResponse, lang:string}>({
+            query:({document, lang})=>({
+                url:`/documents/${document.document_id}`,
+                method:"PUT",
+                body:{
+                    document_type:document.document_type,
+                    document_number:document.document_number,
+                    file_url:document.file_url,
+                    lang
+                }
+            }),
+            invalidatesTags:['microfinances']
+        }),
+        createDocument:builder.mutation<{success:boolean},{user_id:number, document:DocumenetRequest, lang:string}>({
+            query:({user_id, document, lang})=>({
+                url:"/documents",
+                method:"POST",
+                body:{
+                    user_id,
+                    document,
+                    lang
+                }
+            }),
+            invalidatesTags:['microfinances']
         })
     })
 })
@@ -81,5 +126,8 @@ export const {
     useCreateMicrofinanceMutation,
     useCreateTenantLicenceMutation,
     useGetMetrickByIdQuery,
-    useLazyGetMetrickByIdQuery
+    useLazyGetMetrickByIdQuery,
+    useUpdateMicorfinanceMutation,
+    useUpdateDocumentMutation,
+    useCreateDocumentMutation
 } = microfinanceApi

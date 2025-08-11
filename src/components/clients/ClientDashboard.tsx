@@ -52,7 +52,6 @@ const ClientDashboard = () => {
   }
 
   // console.log(microfinance?.meta.total_pages)
-  console.log("filteredClients", filteredClients)
   return (
     <div className="w-full space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

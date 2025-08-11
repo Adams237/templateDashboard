@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { UserInterface } from '../utils/interfaces/user.interface';
 import { useGetOneUSerQuery } from '../utils/feature/auth/authApi';
 import { MicrofinanceResponse } from '../utils/feature/microfinance/type';
 import { useTranslation } from 'react-i18next';
@@ -34,9 +33,9 @@ export default function SettingsPage() {
   const lastLogin = format(new Date(), 'EEEE d MMMM yyyy', { locale: i18n.language === 'fr' ? fr : enUS });
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <div className=' flex flex-row items-center justify-between' >
+      <div className=' flex md:flex-row flex-col items-center justify-between' >
         <div className=' flex flex-row items-center'>
-          <img src={user?.profile_picture} />
+          <img className='w-[50px] h-[50px] rounded-full mr-2' src={user?.profile_picture} />
           <div>
             <h2 className="text-xl font-bold text-gray-900">{user?.name}</h2>
             <p className='font-[100] text-gray-400 ' >{user?.email}</p>
@@ -101,7 +100,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <div className='w-full flex justify-end mt-5' >
-              <Button onClick={()=>navigate(`/settings/${id}`, {state:curentUser})} >
+              <Button onClick={()=>navigate(`/settings/update`, {state:curentUser})} >
                 {t("settings.update")}
               </Button>
             </div>

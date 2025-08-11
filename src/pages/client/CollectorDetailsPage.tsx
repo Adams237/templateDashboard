@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import CollectorDetails from '../components/collectors/CollectorDetails';
+import CollectorDetails from '../../components/collectors/CollectorDetails';
 
 const mockCollector = {
   id: '1',

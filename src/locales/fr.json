@@ -49,7 +49,14 @@
     "mois":"mois",
     "error_licence_api":"Selectionnez un package",
     "license_upadte":"Licence ajouter avec succès",
-    "user_mincr":"Le nombre d'utilisateur de cette microfinance est "
+    "user_mincr":"Utilisateurs",
+    "update":"Mettre a jour la microfinance",
+    "phone_invalid":"Le numéro de Téléphone doit commencer par +237 ou 6 et contenir 13 ou 9 caractères",
+    "edit_document":"Mettre a jour un document",
+    "save":"Sauvegarder",
+    "create_at":"Date de creation",
+    "create_document":"Ajouter un document",
+    "document_success":"Document créer avec succès"
   },
   "package":{
     "title":"Liste des Licences Disponible",
@@ -126,23 +133,23 @@
     "logging_in":"Connexion en cours"
   },
   "settings":{
-    "info_perso":"Information personnelle",
-    "last_login":"Derniere connexion",
-    "name":"Nom et prenom",
+    "info_perso":"Informations personnelles",
+    "last_login":"Dernière connexion",
+    "name":"Nom et prénom",
     "email":"Email",
-    "phone":"Telephone",
+    "phone":"Téléphone",
     "country":"Pays",
     "city":"Ville",
     "address":"Addresse",
-    "update_password":"Mettre a jour votre mot de passe",
+    "update_password":"Mettre à jour votre mot de passe",
     "old_password":"Ancien mot de passe",
     "old_password_required":"Ancien mot de passe est necessaire",
     "new_password_required":"Entrez le nouveau mot de passe",
     "new_password":"Nouveau mot de passe",
-    "updated_password":"Mettre a jour le mot de passe",
-    "update":"Mettre a jour vos infromations",
-    "unpdate_success":"Mise a jour reussi",
-    "update_inf":"Mettre a jour"
+    "updated_password":"Mettre à jour le mot de passe",
+    "update":"Mettre a jour vos informations",
+    "unpdate_success":"Mise à jour réussie",
+    "update_inf":"Mettre à jour"
   },
   "load_error":"Erreur lors du chargement",
   "next":"Suivant",
