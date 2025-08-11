@@ -5,7 +5,6 @@ import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { getStatusColor } from '../../data/mockClients';
-import { MICROFINANCES } from '../../data/microfinance';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { formaNumber } from '../../utils/feature/utils';
@@ -41,10 +40,9 @@ const ClientDashboard = () => {
 
   // Calculate summary statistics
   const summaryStats = {
-    totalClients: MICROFINANCES.length,
-    activeClients: MICROFINANCES.filter(c => c.status === 'active').length,
-    totalCollected: MICROFINANCES.length,
-    averageSuccess: (MICROFINANCES.filter(c => c.status === 'active').length / MICROFINANCES.length) * 100
+    totalClients: microfinance?.meta.total,
+    activeClients: microfinance?.data.filter(c => c.status.toLowerCase() === 'active').length,
+    averageSuccess: microfinance ? (microfinance?.data.filter(c => c.status.toLowerCase() === 'active').length / microfinance?.meta.total) * 100 :0
   };
 
   if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500 animate-spin' /></div>
@@ -63,7 +61,7 @@ const ClientDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Clients actifs</p>
-                <p className="text-2xl font-semibold">{formaNumber(summaryStats.activeClients)}</p>
+                <p className="text-2xl font-semibold">{formaNumber(summaryStats.activeClients??0)}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
                 <Users size={24} className="text-blue-600" />
@@ -77,7 +75,7 @@ const ClientDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Total Microfinance</p>
-                <p className="text-2xl font-semibold">{formaNumber(summaryStats.totalClients)}</p>
+                <p className="text-2xl font-semibold">{formaNumber(summaryStats.totalClients??0)}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
                 <TrendingUp size={24} className="text-green-600" />

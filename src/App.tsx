@@ -18,6 +18,7 @@ import ClientDetailsModal from './components/clients/ClientDetailsModal';
 import NewMicrofinance from './pages/NewMicrofinance';
 import LicencePage from './pages/Licences/LicencePage';
 import UserLicencePage from './pages/UserLicencePage';
+import SettingsUpdaInf from './pages/SettingsUpdaInf';
 
 export default function App() {
   initCryptoKeys().catch(console.error);
@@ -43,6 +44,7 @@ export default function App() {
             <Route path="accounts" element={<LicencePage />} />
             <Route path="assignments" element={<AssignmentsPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="settings/:id" element={<SettingsUpdaInf />} />
             <Route path="new-microfinance" element={<NewMicrofinance />} />
             <Route path="licence-microfinance" element={<UserLicencePage />} />
             <Route path="*" element={<div>404 - Page non trouvée</div>} />

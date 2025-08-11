@@ -10,6 +10,12 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { formaNumber } from '../../utils/feature/utils';
 import { useGetMicrofinanceByIdQuery } from '../../utils/feature/microfinance/microfinanceApi';
+import Button from '../ui/Button';
+import Modal from '../Modal/Modal';
+import NewTenantLicense from '../forms/NewTenantLicense';
+import { ToastContainer } from 'react-toastify';
+import { DocumenetResponse } from '../../utils/feature/document/type';
+import Metrick from './Metrick';
 
 
 
@@ -27,28 +33,30 @@ const defaultCenter = {
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
 const ClientDetailsModal = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'transactions' | 'schedule' | 'documents' | 'activities' | 'location'>('overview');
+  const [activeTab, setActiveTab] = useState<'metrick' | 'overview' | 'transactions' | 'schedule' | 'documents' | 'activities' | 'location' | 'tenant_licence'>('overview');
 
 
   const { id } = useParams()
   const { t, } = useTranslation()
   const clientId = id ?? ""
+  const [openCreateLicense, setOpenCreateLicense] = useState(false)
   const { data: client, isLoading, error } = useGetMicrofinanceByIdQuery(clientId)
+  const [document, setDocument] = useState<DocumenetResponse | null>(null)
 
-
-  console.log(client)
+  // console.log(client)
   // Move useEffect outside of conditional rendering
 
 
 
-  console.log("laaaaaaaaaa")
   const tabs = [
     { id: 'overview', label: 'Aperçu' },
     // { id: 'transactions', label: 'Transactions' },
     // { id: 'schedule', label: 'Planning collectes' },
     { id: 'documents', label: 'Documents' },
     // { id: 'activities', label: 'Activités' },
-    { id: 'location', label: 'Localisation' },
+    // { id: 'location', label: 'Localisation' },
+    { id: 'tenant_licence', label: 'Licences' },
+    { id: 'metrick', label: 'Utilisateurs' },
   ];
 
   if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500 animate-spin' /></div>
@@ -64,12 +72,12 @@ const ClientDetailsModal = () => {
         <div>
           <h2 className="text-xl font-semibold text-gray-900">
 
-            <span className="text-gray-500 text-sm">Nom de la microfinance:</span> {client.name}
+            <span className="text-gray-500 text-sm">{t("microfinace.name")}:</span> {client.name}
           </h2>
           <div className="mt-1 flex items-center space-x-2">
             <Badge variant={getStatusColor(client.status.toLowerCase())}>
-              {client.status.toLowerCase() === 'active' ? 'Actif' :
-                client.status.toLowerCase() === 'inactive' ? 'Inactif' :
+              {client.status.toLowerCase() === 'active' ? t("licence.actif") :
+                client.status.toLowerCase() === 'pending' ? t("licence.pending") :
                   'Suspendu'}
             </Badge>
 
@@ -77,9 +85,24 @@ const ClientDetailsModal = () => {
           </div>
         </div>
         <div className="text-right">
-          <div className="text-sm text-gray-500">Client depuis</div>
+          <div className="text-sm text-gray-500">{t("microfinace.client_from")}</div>
           <div className="font-medium">{create_at.toLocaleDateString()}</div>
         </div>
+      </div>
+      <div className='flex items-center gap-2 justify-end' >
+        <Button variant='outline'>
+          {t("microfinace.update_client")}
+        </Button>
+        {
+          client.TenantLicenses?.length > 0 ?
+            <Button onClick={() => setOpenCreateLicense(true)}>
+              {t("microfinace.update_licence")}
+            </Button> :
+            <Button onClick={() => setOpenCreateLicense(true)}>
+              {t("microfinace.new_licence")}
+            </Button>
+        }
+
       </div>
 
       {/* Tabs Navigation */}
@@ -88,7 +111,10 @@ const ClientDetailsModal = () => {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              onClick={() => {
+                setActiveTab(tab.id as typeof activeTab)
+                setDocument(null)
+              }}
               className={`
                   whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
                   ${activeTab === tab.id
@@ -290,22 +316,60 @@ const ClientDetailsModal = () => {
                 {client.Documents?.map((document, index) => {
                   const date_delivrance = new Date(document.created_at)
                   const date_expire = new Date(document.updated_at)
-                 return <Table.Row key={index}>
+                  return <Table.Row key={index}>
                     <Table.Cell>
                       <div className="flex items-center">
                         <FileText size={16} className="text-gray-400 mr-2" />
                         <span>
-                          {document.document_type === 'ID' ? 'Pièce d\'identité' :
-                            document.document_type === 'proof_address' ? 'Justificatif de domicile' :
-                              document.document_type === 'business_registration' ? 'Registre de commerce' :
-                                'Document fiscal'}
+                          {document.document_type}
                         </span>
                       </div>
                     </Table.Cell>
                     <Table.Cell>{document.document_number}</Table.Cell>
                     <Table.Cell>{date_delivrance.toLocaleDateString()}</Table.Cell>
                     <Table.Cell>{date_expire.toLocaleDateString()}</Table.Cell>
-                    <Table.Cell className='cursor-pointer'><Eye/></Table.Cell>
+                    <Table.Cell className='cursor-pointer'><span onClick={() => setDocument(document)} ><Eye /></span></Table.Cell>
+
+                  </Table.Row>
+                })}
+              </Table.Body>
+            </Table>
+            {
+              document && <div>
+                <img src={document.file_url} alt="" />
+              </div>
+            }
+          </div>
+        )}
+        {activeTab === 'tenant_licence' && (
+          <div className="space-y-4">
+            <Table>
+              <Table.Head>
+                <Table.Row>
+                  <Table.HeadCell>Token</Table.HeadCell>
+                  <Table.HeadCell>Statut</Table.HeadCell>
+                  <Table.HeadCell>Date de creation</Table.HeadCell>
+                  <Table.HeadCell>Date d'expiration</Table.HeadCell>
+                  <Table.HeadCell>Statut</Table.HeadCell>
+                </Table.Row>
+              </Table.Head>
+              <Table.Body>
+                {client.TenantLicenses?.map((licence, index) => {
+                  const date_delivrance = new Date(licence.created_at)
+                  const date_expire = new Date(licence.license_expires)
+                  return <Table.Row key={index}>
+                    <Table.Cell>
+                      <div className="flex items-center">
+                        <FileText size={16} className="text-gray-400 mr-2" />
+                        <span>
+                          {licence.auth_token}
+                        </span>
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell>{licence.license_status}</Table.Cell>
+                    <Table.Cell>{date_delivrance.toLocaleDateString()}</Table.Cell>
+                    <Table.Cell>{date_expire.toLocaleDateString()}</Table.Cell>
+                    <Table.Cell className='cursor-pointer'><Eye /></Table.Cell>
 
                   </Table.Row>
                 })}
@@ -314,8 +378,27 @@ const ClientDetailsModal = () => {
           </div>
         )}
 
+        {
+          activeTab === 'metrick' && (
+            <Metrick />
+          )
+        }
+
 
       </div>
+      <Modal isOpen={openCreateLicense} onClose={() => setOpenCreateLicense(false)} title={t("microfinace.new_licence")}>
+        <NewTenantLicense onClose={() => setOpenCreateLicense(false)} />
+      </Modal>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
     </div>
 
   );

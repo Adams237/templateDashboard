@@ -12,7 +12,7 @@ export const userLicenceApi = createApi({
             page: number,
             limit: number,
             user_id?: number,
-            license_status?: 'ACTIVE' | 'EXPIRED' | 'SUSPENDED',
+            license_status?: 'ACTIVE' | 'EXPIRED' | 'SUSPENDED' | "PENDING",
             expires_from?: string,
             expires_to?: string,
             lang: "en" | "fr"
@@ -57,6 +57,17 @@ export const userLicenceApi = createApi({
                 }
             }),
             invalidatesTags:['userLicences']
+        }),
+        blockerUser:builder.mutation<{success:boolean},{blocked:boolean, user_id:number}>({
+            query:({blocked,user_id})=>({
+                url:"/users/block",
+                method:"POST",
+                body:{
+                    blocked,
+                    user_id
+                }
+            }),
+            invalidatesTags:['userLicences']
         })
     })
 
@@ -66,5 +77,6 @@ export const userLicenceApi = createApi({
 export const {
     useGetAllUserLicencesQuery,
     useLazyGetAllUserLicencesQuery,
-    useUpdateStatusMutation
+    useUpdateStatusMutation,
+    useBlockerUserMutation
 } = userLicenceApi

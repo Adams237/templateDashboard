@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, Users, TrendingUp, AlertTriangle, Loader, Ban, Rocket, Loader2, } from 'lucide-react';
+import { Search, Filter, Users, TrendingUp, AlertTriangle, Loader,  Loader2, CircleEllipsis, } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { USERLICENCE } from '../data/user_licence';
 import Card from '../components/ui/Card';
 import { formaNumber } from '../utils/feature/utils';
 import Table from '../components/ui/Table';
 import { getStatusColor } from '../data/mockClients';
 import Badge from '../components/ui/Badge';
-import { useLazyGetAllUserLicencesQuery, useUpdateStatusMutation } from '../utils/feature/userLicence/userLicenceApi';
+import { useBlockerUserMutation, useLazyGetAllUserLicencesQuery, useUpdateStatusMutation } from '../utils/feature/userLicence/userLicenceApi';
 import { format } from 'date-fns';
 import { toast } from 'react-toastify';
 
@@ -15,12 +14,13 @@ const UserLicencePage = () => {
   const { t, i18n } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('');
   const [lang, setLang] = useState<"fr" | "en">(i18n.language === "fr" ? "fr" : "en")
-  const [statusFilter, setStatusFilter] = useState<"ACTIVE" | "EXPIRED" | "SUSPENDED" | "all">('all');
-
+  const [statusFilter, setStatusFilter] = useState<"ACTIVE" | "EXPIRED" | "SUSPENDED" | "all" | "PENDING">('all');
+  const [isOpen, setIsOpen] = useState<string>()
   const [page, setPage] = useState(1)
   const limit = 10
   const [fetchLicences, { data: lazyData, isLoading, isFetching, error }] = useLazyGetAllUserLicencesQuery();
   const [update, { isLoading: load }] = useUpdateStatusMutation()
+  const [blockedUser, {isLoading:loadBlocked}] = useBlockerUserMutation()
 
   useEffect(() => {
     setLang(i18n.language === "fr" ? "fr" : "en")
@@ -56,12 +56,14 @@ const UserLicencePage = () => {
   const summaryStats = {
     totalClients: userLicences?.meta.total,
     activeClients: userLicences?.data.filter(c => c.license_status.toLowerCase() === 'active').length,
-    averageSuccess: (USERLICENCE.filter(c => c.license_status.toLowerCase() === 'active').length / USERLICENCE.length) * 100
+     averageSuccess: userLicences? ((userLicences?.data.filter(c => c.license_status.toLowerCase() === 'active').length / userLicences?.meta.total) * 100):0
   };
 
-  const updateStatus = async (id: string, status: "ACTIVE" | "EXPIRED" | "SUSPENDED") => {
+  const updateStatus = async (id: string, status: "ACTIVE" | "EXPIRED" | "SUSPENDED" | "PENDING") => {
     try {
       await update({ id, lang, status }).unwrap()
+      setIsOpen("")
+      toast.success(t("licence.update_statut_complet"))
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error)
@@ -69,13 +71,23 @@ const UserLicencePage = () => {
     }
   }
 
+  const handleBlocked = async (blocked:boolean, user_id:number)=>{
+    try {
+      await blockedUser({blocked, user_id}).unwrap()
+      toast.success(t("licence.update_statut_complet"))
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error:any) {
+      console.log(error)
+      toast.error(error.data.message)
+    }
+  }
 
-  if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500' /></div>
+
+  if (isLoading) return <div className='flex items-center justify-center h-[50vh] w-[70vw]' ><Loader className='w-52 h-52 text-green-500 animate-spin' /></div>
   if (error) {
     console.log(error)
     return <div className='flex items-center justify-center text-red-500 font-bold text-xl'>{t("load_error")}</div>
   }
-
   return (
     <div className="  space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -149,6 +161,7 @@ const UserLicencePage = () => {
               <option value="ACTIVE">{t("licence.actif")}</option>
               <option value="SUSPENDED">{t("licence.suspendue")}</option>
               <option value="EXPIRED">{t("licence.expired")}</option>
+              <option value="PENDING">{t("licence.pending")}</option>
             </select>
           </div>
 
@@ -157,7 +170,7 @@ const UserLicencePage = () => {
       </div>
 
 
-      <div>
+      <div className=' relative'>
         <Table>
           <Table.Head>
             <Table.Row>
@@ -180,8 +193,8 @@ const UserLicencePage = () => {
 
                 <Table.Cell>
                   <Badge variant={getStatusColor(client.license_status.toLowerCase())}>
-                    {client.license_status.toLowerCase() === 'active' ? 'Actif' :
-                      client.license_status.toLowerCase() === 'expired' ? 'EXPIRED' :
+                    {client.license_status.toLowerCase() === 'active' ? t("licence.actif") :
+                      client.license_status.toLowerCase() === 'pending' ? t("licence.pending") :
                         'Suspendu'}
                   </Badge>
                 </Table.Cell>
@@ -196,15 +209,34 @@ const UserLicencePage = () => {
                 </Table.Cell>
                 <Table.Cell>
                   <div>
+                    <CircleEllipsis className=' cursor-pointer ' onClick={() => {
+                      if (isOpen === client.tenant_license_id) {
+                        setIsOpen("")
+                      } else {
+                        setIsOpen(client.tenant_license_id)
+                      }
+                    }} />
                     {
-                      client.license_status === "ACTIVE" ?
-                        <span onClick={() => updateStatus(client.tenant_license_id, "SUSPENDED")} className='w-6 h-6 text-red-500 hover:text-red-600 cursor-pointer' >
-                          {load ? <Loader2 /> : <Ban />}
-                        </span> :
-                        <span onClick={() => updateStatus(client.tenant_license_id, "ACTIVE")} className='w-6 h-6 text-green-500 hover:text-green-600 cursor-pointer'>
-                          {load ? <Loader2 /> : <Rocket />}
-                        </span>
+                      isOpen === client.tenant_license_id &&
+                      <div className=' bg-slate-300 flex flex-col items-center justify-center w-[10%] right-3 absolute'>
+                        <button disabled={load} onClick={() => updateStatus(client.tenant_license_id, "ACTIVE")} className=' hover:bg-slate-100 w-full flex items-center justify-center text-center cursor-pointer '>
+                          { load?<Loader2 className=' text-green-400 animate-spin' />: t("licence.activer")}
+                        </button>
+                        <div className='w-full h-[1px] bg-gray-500' ></div>
+                        <button disabled={load}  onClick={() => updateStatus(client.tenant_license_id, "SUSPENDED")}  className=' flex items-center justify-center  hover:bg-slate-100 w-full text-center cursor-pointer '>
+                          { load?<Loader2 className=' text-green-400 text-center animate-spin' />: t("licence.supendre")}
+                        </button>
+                        <div className='w-full h-[1px] bg-gray-500' ></div>
+                        <button onClick={()=>handleBlocked(true, Number(client.tenant_license_id))} className=' hover:bg-slate-100 w-full text-center flex items-center justify-center  cursor-pointer '>
+                          { loadBlocked?<Loader2 className=' text-green-400 animate-spin' />: t("licence.blocker")}
+                        </button>
+                        <div className='w-full h-[1px] bg-gray-500' ></div>
+                        <button onClick={()=>handleBlocked(false, Number(client.tenant_license_id))} className=' hover:bg-slate-100 w-full text-center flex items-center justify-center  cursor-pointer '>
+                          { loadBlocked?<Loader2 className=' text-green-400 animate-spin' />: t("licence.deblocker")}
+                        </button>
+                      </div>
                     }
+
                   </div>
 
 
@@ -223,13 +255,13 @@ const UserLicencePage = () => {
           </button>
 
           <span>
-            Page {userLicences?.meta.page} sur {userLicences?.meta.totalPages}
+            Page {userLicences?.meta.page} sur {userLicences?.meta.total_pages}
             {isFetching && ' …'}
           </span>
 
           <button
-            onClick={() => setPage((p) => Math.min(p + 1, userLicences?.meta.totalPages ?? 1))}
-            disabled={page === (userLicences?.meta.totalPages ?? 1) || isFetching}
+            onClick={() => setPage((p) => Math.min(p + 1, userLicences?.meta.total_pages ?? 1))}
+            disabled={page === (userLicences?.meta.total_pages ?? 1) || isFetching}
             className="px-3 py-1 border rounded disabled:opacity-50"
           >
             {t("next")} ›

@@ -1,14 +1,17 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { UserInterface } from '../../utils/interfaces/user.interface'
+// import { UserInterface } from '../../utils/interfaces/user.interface'
+import { MicrofinanceResquest } from '../../utils/feature/microfinance/type'
+import { Loader2 } from 'lucide-react'
 
 
 interface RecapProps {
     setStep: (step: number) => void
     onSubmit: () => void,
-    microfinance: UserInterface | undefined
+    microfinance: MicrofinanceResquest | undefined,
+    isLoading:boolean
 }
-function RecapeCreate({ setStep, onSubmit, microfinance }: RecapProps) {
+function RecapeCreate({ setStep, onSubmit, microfinance, isLoading }: RecapProps) {
     const { t } = useTranslation()
     return (
         <div className="mx-auto w-[90%] p-6 bg-white rounded-2xl shadow-md space-y-6" >
@@ -66,9 +69,10 @@ function RecapeCreate({ setStep, onSubmit, microfinance }: RecapProps) {
             </div>
             <button
                 onClick={onSubmit}
-                className="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
+                disabled={isLoading}
+                className="w-full py-2 bg-blue-600 text-white flex items-center justify-center rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
             >
-                {t('microfinace.submit')}
+                { isLoading?<Loader2 className=' animate-spin ' />: t('microfinace.submit')}
             </button>
         </div>
     )

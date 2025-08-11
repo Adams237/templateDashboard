@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react"
 import { baseQueryPrivate } from "../../redux/baseUrl"
-import { MicrofinanceResponse } from "./type"
+import { MetrickResponse, MicrofinanceResponse, MicrofinanceResquest } from "./type"
 import { pagination } from "../../interfaces/user.interface"
 
 export const microfinanceApi = createApi({
@@ -26,6 +26,49 @@ export const microfinanceApi = createApi({
         getMicrofinanceById:builder.query<MicrofinanceResponse,string>({
             query:(id)=>`/users/${id}`,
             providesTags:['microfinances']
+        }),
+        createMicrofinance:builder.mutation<{success:boolean}, MicrofinanceResquest>({
+            query:(credential)=>({
+                url:"/users/tenant",
+                method:"POST",
+                body:{
+                    name:credential.name,
+                    email:credential.email,
+                    password_hash:credential.password_hash,
+                    phone_number:credential.phone_number,
+                    profile_picture:credential.profile_picture,
+                    apiUrl:credential.apiUrl,
+                    address:credential.address,
+                    city:credential.city,
+                    country:credential.country,
+                    documents:[...credential.documents],
+                    is_tenant:true
+                }
+            }),
+            invalidatesTags:['microfinances']
+        }),
+        createTenantLicence:builder.mutation<{success:boolean}, {user_id:number, license_plan_id:number,lang:string,auth_token:string}>({
+            query:({user_id, license_plan_id, lang, auth_token})=>({
+                url:"/tenant-licenses",
+                method:"POST",
+                params:{lang},
+                body:{
+                    user_id,
+                    license_plan_id, 
+                    lang,
+                    auth_token
+                }
+            }),
+            invalidatesTags:['microfinances']
+        }),
+        getMetrickById:builder.query<MetrickResponse,{user_id:number, month:string}>({
+            query:({user_id, month})=>({
+                url:`/tenant-metrics/${user_id}`,
+                params:{
+                    user_id:user_id,
+                    month :month 
+                }
+            })
         })
     })
 })
@@ -34,5 +77,9 @@ export const {
     useGetAllMicrofinanceQuery,
     useLazyGetAllMicrofinanceQuery,
     useGetMicrofinanceByIdQuery,
-    useLazyGetMicrofinanceByIdQuery
+    useLazyGetMicrofinanceByIdQuery,
+    useCreateMicrofinanceMutation,
+    useCreateTenantLicenceMutation,
+    useGetMetrickByIdQuery,
+    useLazyGetMetrickByIdQuery
 } = microfinanceApi

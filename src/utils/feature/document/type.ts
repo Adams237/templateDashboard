@@ -4,7 +4,8 @@ export interface DocumenetResponse {
     document_number: string,
     document_type: string,
     created_at: string,
-    updated_at: string
+    updated_at: string,
+    file_url:string
 }
 
 export interface DocumenetRequest {

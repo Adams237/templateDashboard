@@ -427,6 +427,8 @@ export const getStatusColor = (status: string) => {
       return 'success';
     case 'inactive':
       return 'secondary';
+    case "pending":
+      return "warning"
     case 'suspended':
       return 'danger';
     default:

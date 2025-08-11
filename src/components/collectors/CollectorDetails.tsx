@@ -41,17 +41,14 @@ interface CollectorDetailsProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }
-interface Affectation {
-  affectation: affectation;
 
-}
 
 const CollectorDetails: React.FC<CollectorDetailsProps> = ({
   collector,
   onEdit,
   onDelete,
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'transactions' | 'performance'>('overview');
+  const [activeTab, setActiveTab] = useState<string>('overview');
 
   const performanceData = [
     { date: '2024-03-10', amount: 280000, target: 300000 },
@@ -161,7 +158,7 @@ const CollectorDetails: React.FC<CollectorDetailsProps> = ({
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`
                   py-4 px-1 border-b-2 font-medium text-sm
                   ${

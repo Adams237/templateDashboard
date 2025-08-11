@@ -1,55 +1,49 @@
 // src/features/auth/LoginForm.tsx
 import React from 'react'
-import { Controller, useFormContext } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 // import { UserInterface } from '../../utils/interfaces/user.interface'
 import imageCompression from 'browser-image-compression';
-import { fileToBase64 } from '../../utils/feature/utils';
-import { MicrofinanceResquest } from '../../utils/feature/microfinance/type';
+import { MicrofinanceResponse } from '../../../utils/feature/microfinance/type';
+import { fileToBase64 } from '../../../utils/feature/utils';
+import { ToastContainer } from 'react-toastify';
+import { Loader2 } from 'lucide-react';
 
 // 1. Définition des données du formulaire
 
 
 interface DataProps {
-    onSubmit: (data: MicrofinanceResquest) => Promise<void> | void,
-    setStep: (step: number) => void
+    onSubmit: (data: MicrofinanceResponse) => Promise<void> | void,
+    defaultValue: MicrofinanceResponse
 }
 
 // Regex pour numéro camerounais
 const phoneRegex = /^(?:\+237|0)6[0-9]{8}$/
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-const NewMicrofinanceForm: React.FC<DataProps> = ({ onSubmit, setStep }) => {
+const UpdateInfo: React.FC<DataProps> = ({ onSubmit, defaultValue }) => {
     const { t } = useTranslation()
     const {
         control,
         register,
         handleSubmit,
-        watch,
         formState: { errors, isSubmitting },
-    } = useFormContext<MicrofinanceResquest>()
+    } = useForm<MicrofinanceResponse>({ defaultValues: defaultValue })
 
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
             className=" mx-auto w-[90%] p-6 bg-white rounded-2xl shadow-md space-y-6"
         >
-            <div className="flex justify-center items-center">
-                <div onClick={() => setStep(1)} className=' cursor-pointer bg-green-600 font-bold text-[18px] text-white w-8 h-8 rounded-full flex items-center justify-center ' >1</div>
-                <div className=' h-1 w-[40%] bg-gray-400 ' ></div>
-                <div className=' cursor-not-allowed bg-gray-600 font-bold text-[18px] text-white w-8 h-8 rounded-full flex items-center justify-center ' >2</div>
-                <div className=' h-1 w-[40%] bg-gray-400 ' ></div>
-                <div className=' cursor-not-allowed bg-gray-600 font-bold text-[18px] text-white w-8 h-8 rounded-full flex items-center justify-center ' >{t("microfinace.end")}</div>
-            </div>
+
 
             <h2 className="text-2xl font-bold text-center">
-                {t("microfinace.new")}
+                {t("settings.update")}
             </h2>
 
             <div className='grid md:grid-cols-2 grid-cols-1 space-x-2'>
                 {/* Name */}
                 <div className='ml-2'>
                     <label htmlFor="name" className="block text-sm font-medium mb-1">
-                        {t("microfinace.name")}
+                        {t("settings.name")}
                     </label>
                     <input
                         id="name"
@@ -72,16 +66,17 @@ const NewMicrofinanceForm: React.FC<DataProps> = ({ onSubmit, setStep }) => {
                 {/* Email */}
                 <div>
                     <label htmlFor="email" className="block text-sm font-medium mb-1">
-                        {t("microfinace.email")}
+                        {t("settings.email")}
                     </label>
                     <input
                         id="email"
+                        readOnly
                         type="email"
                         {...register('email', {
                             required: t("microfinace.email_required"),
 
                         })}
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.email
+                        className={`w-full px-4 py-2 border rounded-lg bg-gray-300 focus:outline-none focus:ring-2 ${errors.email
                             ? 'border-red-500 focus:ring-red-300'
                             : 'border-gray-300 focus:ring-blue-300'
                             }`}
@@ -97,7 +92,7 @@ const NewMicrofinanceForm: React.FC<DataProps> = ({ onSubmit, setStep }) => {
                 {/* Phone */}
                 <div>
                     <label htmlFor="name" className="block text-sm font-medium mb-1">
-                        {t("microfinace.phone_number")}
+                        {t("settings.phone")}
                     </label>
                     <input
                         id="phone"
@@ -121,60 +116,7 @@ const NewMicrofinanceForm: React.FC<DataProps> = ({ onSubmit, setStep }) => {
                     )}
                 </div>
 
-                <div>
-                    <label htmlFor="name" className="block text-sm font-medium mb-1">
-                        {t("microfinace.password")}
-                    </label>
-                    <input
-                        id="password"
-                        type="password"
-                        {...register('password_hash', {
-                            required: t("microfinace.password_required"),
-                            pattern: {
-                                value: passwordRegex,
-                                message: t("microfinace.password_invalid")
-                            }
-                        })}
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.password_hash
-                            ? 'border-red-500 focus:ring-red-300'
-                            : 'border-gray-300 focus:ring-blue-300'
-                            }`}
-                    />
-                    {errors.password_hash && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {errors.password_hash.message}
-                        </p>
-                    )}
-                </div>
 
-                {/* Confirm Password */}
-                <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
-                        {t("microfinace.confirm_password")}
-                    </label>
-                    <input
-                        id="confirmPassword"
-                        type="password"
-                        {...register('confirm_password', {
-                            required: t("microfinace.confirm_password_required"),
-                            validate: (value) => {
-                                if (value !== watch('password_hash')) {
-                                    return t("microfinace.password_match");
-                                }
-                                return true;
-                            }
-                        })}
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.confirm_password
-                            ? 'border-red-500 focus:ring-red-300'
-                            : 'border-gray-300 focus:ring-blue-300'
-                            }`}
-                    />
-                    {errors.confirm_password && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {errors.confirm_password.message}
-                        </p>
-                    )}
-                </div>
 
                 {/* Country */}
                 <div>
@@ -248,29 +190,7 @@ const NewMicrofinanceForm: React.FC<DataProps> = ({ onSubmit, setStep }) => {
                     )}
                 </div>
 
-                  {/* Api */}
-                  <div>
-                    <label htmlFor="apiUrl" className="block text-sm font-medium mb-1">
-                        {t("microfinace.apiUrl")}
-                    </label>
-                    <input
-                        id="apiUrl"
-                        type="text"
-                        {...register('apiUrl', {
-                            required: t("microfinace.apiUrl_required"),
 
-                        })}
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.apiUrl
-                            ? 'border-red-500 focus:ring-red-300'
-                            : 'border-gray-300 focus:ring-blue-300'
-                            }`}
-                    />
-                    {errors.apiUrl && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {errors.apiUrl.message}
-                        </p>
-                    )}
-                </div>
 
 
                 {/* Picture */}
@@ -316,12 +236,22 @@ const NewMicrofinanceForm: React.FC<DataProps> = ({ onSubmit, setStep }) => {
             <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
+                className="w-full py-2 bg-blue-600 text-white flex justify-center items-center rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
             >
-                {isSubmitting ? t("...") : t("microfinace.next")}
+                {isSubmitting ? <Loader2 className=' animate-spin ' /> : t("settings.update_inf")}
             </button>
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={true}
+                closeOnClick
+                pauseOnHover
+                draggable
+                theme="colored"
+            />
         </form>
     )
 }
 
-export default NewMicrofinanceForm
+export default UpdateInfo
