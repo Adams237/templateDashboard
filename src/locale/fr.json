@@ -1,0 +1,23 @@
+{
+    "welcome": "Bienvenue",
+    "login": {
+        "title": "Se connecter",
+        "email": "Email",
+        "phone_number":"Numero de telephone",
+        "password": "Mot de passe",
+        "submit": "Connexion",
+        "verify_captcha":"Veuillez passer la verification Captcha",
+        "captcha_error":"Erreur lors de la verification Captcha",
+        "verify":"Verification",
+        "enter_otp_code":"Entrer le code de verification",
+        "verify_buttom":"Verifier",
+        "logout":"Deconnexion"
+    },
+    "notifications":{
+        "title":"Notifications"
+    },
+    "dashboard": {
+        "title": "Tableau de bord",
+        "welcome": "Bienvenue sur votre tableau de bord"
+    }
+}

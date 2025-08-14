@@ -1,0 +1,13 @@
+{
+    "welcome": "Welcome",
+    "login": {
+        "title": "Login",
+        "email": "Email",
+        "password": "Password",
+        "submit": "Login"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "welcome": "Welcome to your dashboard"
+    }
+}
