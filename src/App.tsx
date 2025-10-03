@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
-import DashboardPage from './pages/DashboardPage';
+// import DashboardPage from './pages/DashboardPage';
 import ClientsPage from './pages/client/ClientsPage';
 import CollectorsPage from './pages/CollectorsPage';
 import TransactionsPage from './pages/TransactionsPage';
@@ -20,6 +20,8 @@ import UserLicencePage from './pages/UserLicencePage';
 import SettingsUpdaInf from './pages/SettingsUpdaInf';
 import CollectorDetailsPage from './pages/client/CollectorDetailsPage';
 import UpdateClientPage from './pages/client/UpdateClientPage';
+import Messages from './pages/Messages/Messages';
+import NewTenantLicense from './components/forms/NewTenantLicense';
 
 export default function App() {
   initCryptoKeys().catch(console.error);
@@ -35,11 +37,12 @@ export default function App() {
         <Route element={<PivateRoute />}>
           {/* Layout englobe Sidebar/Header */}
           <Route element={<Layout />}>
-            <Route path="/" element={<Navigate to="/dashboard" />} />
-            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="/" element={<Navigate to="/clients" />} />
+            {/* <Route path="dashboard" element={<DashboardPage />} /> */}
             <Route path="clients" element={<ClientsPage />} />
             <Route path="clients/:id" element={<ClientDetailsModal />} />
             <Route path="clients/update/:id" element={<UpdateClientPage />} />
+            <Route path="clients/update/licence/:id" element={<NewTenantLicense />} />
             <Route path="collectors" element={<CollectorsPage />} />
             <Route path="collectors/:id" element={<CollectorDetailsPage />} />
             <Route path="transactions" element={<TransactionsPage />} />
@@ -47,6 +50,7 @@ export default function App() {
             <Route path="assignments" element={<AssignmentsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="settings/update" element={<SettingsUpdaInf />} />
+            <Route path="messages" element={<Messages />} />
             <Route path="new-microfinance" element={<NewMicrofinance />} />
             <Route path="licence-microfinance" element={<UserLicencePage />} />
             <Route path="*" element={<div>404 - Page non trouvée</div>} />

@@ -7,7 +7,8 @@ interface RootState {
 
 
 export const baseQueryPrivate = fetchBaseQuery({
-    baseUrl: "https://ecollectsuperadminapi-1.onrender.com/",
+    baseUrl: "https://superadmin.api.collexios.com",
+    // baseUrl: "https://ecollectsuperadminapi-1.onrender.com/",
     // baseUrl: "https://ecollectapi.onrender.com",
     // credentials: 'include',
     prepareHeaders: (headers, { getState }) => {

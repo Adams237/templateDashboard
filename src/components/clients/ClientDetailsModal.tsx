@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MapPin, Phone, Mail, FileText, AlertTriangle, Loader, Eye, Edit, } from 'lucide-react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import Badge from '../ui/Badge';
@@ -10,7 +10,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useGetMicrofinanceByIdQuery } from '../../utils/feature/microfinance/microfinanceApi';
 import Button from '../ui/Button';
 import Modal from '../Modal/Modal';
-import NewTenantLicense from '../forms/NewTenantLicense';
+// import NewTenantLicense from '../forms/NewTenantLicense';
 import { ToastContainer } from 'react-toastify';
 import { DocumenetResponse } from '../../utils/feature/document/type';
 import Metrick from './Metrick';
@@ -39,7 +39,7 @@ const ClientDetailsModal = () => {
   const { id } = useParams()
   const { t, } = useTranslation()
   const clientId = id ?? ""
-  const [openCreateLicense, setOpenCreateLicense] = useState(false)
+  // const [openCreateLicense, setOpenCreateLicense] = useState(false)
   const { data: client, isLoading, error } = useGetMicrofinanceByIdQuery(clientId)
   const [document, setDocument] = useState<DocumenetResponse | null>(null)
   const navigate = useNavigate()
@@ -61,6 +61,7 @@ const ClientDetailsModal = () => {
   if (error) return <div className='flex items-center justify-center text-red-500 font-bold text-xl'>{t("load_error")}</div>
   if (!client) return null;
   const create_at = new Date(client.created_at)
+  console.log(client)
   return (
 
     <div className="space-y-6">
@@ -95,10 +96,10 @@ const ClientDetailsModal = () => {
         </Button>
         {
           client.TenantLicenses?.length > 0 ?
-            <Button onClick={() => setOpenCreateLicense(true)}>
+            <Button onClick={() => navigate(`/clients/update/licence/${clientId}`)}>
               {t("microfinace.update_licence")}
             </Button> :
-            <Button onClick={() => setOpenCreateLicense(true)}>
+            <Button onClick={() =>  navigate(`/clients/update/licence/${clientId}`)}>
               {t("microfinace.new_licence")}
             </Button>
         }
@@ -366,14 +367,17 @@ const ClientDetailsModal = () => {
 
 
       </div>
-      <Modal isOpen={openCreateLicense} onClose={() => setOpenCreateLicense(false)} title={t("microfinace.new_licence")}>
-        <NewTenantLicense onClose={() => setOpenCreateLicense(false)} />
-      </Modal>
+      {/* <Modal isOpen={openCreateLicense} onClose={() => setOpenCreateLicense(false)} title={t("microfinace.new_licence")}>
+        <div className='h-[70vh] overflow-y-auto' >
+          <NewTenantLicense onClose={() => setOpenCreateLicense(false)} />
+        </div>
+
+      </Modal> */}
       <Modal isOpen={openEdit} onClose={() => setIsOpenEdit(false)} title={t("microfinace.edit_document")}>
         {updateDocument && <UpdateDocument updateDocument={updateDocument} setUpdateDocument={setUpdateDocument} />}
       </Modal>
-      <Modal isOpen={openAddDoc} onClose={()=>setOppenAddDoc(false)} title={t("microfinace.edit_document")} >
-        <AddDocument/>
+      <Modal isOpen={openAddDoc} onClose={() => setOppenAddDoc(false)} title={t("microfinace.edit_document")} >
+        <AddDocument />
       </Modal>
       <ToastContainer
         position="top-right"

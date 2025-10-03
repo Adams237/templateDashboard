@@ -6,6 +6,7 @@ import { microfinanceApi } from "../feature/microfinance/microfinanceApi";
 import { licenceApi } from "../feature/licence/licenceApi";
 import { userLicenceApi } from "../feature/userLicence/userLicenceApi";
 import { authApi } from "../feature/auth/authApi";
+import { messageApi } from "../feature/messages/messageApi";
 
 
 const rootReducer = combineReducers({
@@ -13,11 +14,12 @@ const rootReducer = combineReducers({
     [microfinanceApi.reducerPath]:microfinanceApi.reducer,
     [licenceApi.reducerPath]:licenceApi.reducer,
     [userLicenceApi.reducerPath]:userLicenceApi.reducer,
-    [authApi.reducerPath]:authApi.reducer
+    [authApi.reducerPath]:authApi.reducer,
+    [messageApi.reducerPath]:messageApi.reducer
 });
 
 const persistConfig = {
-  key: 'ecollect',
+  key: 'superAdmin_ecollect',
   storage,
   whitelist: ['user'], // seules ces slices seront persistées
 };
@@ -31,7 +33,8 @@ export const store = configureStore({
           microfinanceApi.middleware,
           licenceApi.middleware,
           userLicenceApi.middleware,
-          authApi.middleware
+          authApi.middleware,
+          messageApi.middleware
         )
 })
 store.dispatch(loadTokenFromStorage())

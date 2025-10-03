@@ -25,7 +25,7 @@ export const licenceApi = createApi({
             query:(credential)=>({
                 url:"/license-plans",
                 method:"POST",
-                body:credential
+                body:{...credential,min_months:credential.number_of_months}
             }),
             invalidatesTags:['licences']
         }),

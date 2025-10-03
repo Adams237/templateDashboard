@@ -29,6 +29,7 @@ const UpdateLicenceForm: React.FC<DataProps> = ({ onSubmit, licence }) => {
     const features_en = watch('features_en')
     const limitations = watch('limitations')
     const limitations_en = watch('limitations_en')
+    const discount_rules = watch("discount_rules") ?? []
 
     const handleDeleteFeature = (index: number, type: string) => {
         if (type === 'features') {
@@ -73,6 +74,17 @@ const UpdateLicenceForm: React.FC<DataProps> = ({ onSubmit, licence }) => {
             setValue('limitations_en', updatedLimitations);
         }
     };
+
+    const handleAddReduction = () => {
+        const updateAddReduction = [...discount_rules, { from_months: 0, percent: 0 }]
+        setValue("discount_rules", updateAddReduction)
+    }
+    const handleDeleteReduction = (index: number) => {
+        const updatedReduction = [...discount_rules]
+        updatedReduction.splice(index, 1)
+        setValue("discount_rules", updatedReduction)
+    }
+
 
 
 
@@ -284,7 +296,7 @@ const UpdateLicenceForm: React.FC<DataProps> = ({ onSubmit, licence }) => {
                         <option value="true">{t("package.popular_true")}</option>
                         <option value="false">{t("package.popular_false")}</option>
                     </select>
-                    
+
                     {errors.popular && (
                         <p className="mt-1 text-sm text-red-600">
                             {errors.popular.message}
@@ -436,6 +448,60 @@ const UpdateLicenceForm: React.FC<DataProps> = ({ onSubmit, licence }) => {
                             className="text-blue-500 bg-blue-100 px-2 py-1 rounded-lg flex items-center gap-2 hover:text-blue-700"
                         >
                             {t("package.add_limitations_en")}
+                            <Plus className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                </div>
+
+                {/* reduction */}
+                <div className='mt-5' >
+                    <label htmlFor="limitations" className="block text-sm font-medium mb-1">
+                        {t("package.discount_rules")}
+                    </label>
+                    {discount_rules?.map((limitation, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <div>
+                                <label htmlFor={`discount_rules-${index}.from_months`}>{t("package.from_months")}</label>
+                                <input
+                                    type="number"
+                                    id={`discount_rules-${index}.from_months`}
+                                    {...register(`discount_rules.${index}.from_months`, {
+                                        required: t("package.discount_rules_from_months_required"),
+                                    })}
+                                    className={`w-full px-4 py-2 border mb-2 rounded-lg focus:outline-none focus:ring-2 ${errors.discount_rules ? 'border-red-500 focus:ring-red-300' : 'border-gray-300 focus:ring-blue-300'
+                                        }`}
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor={`discount_rules-${index}.from_months`}>{t("package.precent")}</label>
+                                <input
+                                    type="number"
+                                    id={`discount_rules-${index}.percent`}
+                                    {...register(`discount_rules.${index}.percent`, {
+                                        required: t("package.discount_rules_percent_required"),
+                                    })}
+                                    className={`w-full px-4 py-2 border mb-2 rounded-lg focus:outline-none focus:ring-2 ${errors.discount_rules ? 'border-red-500 focus:ring-red-300' : 'border-gray-300 focus:ring-blue-300'
+                                        }`}
+                                />
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => handleDeleteReduction(index)}
+                                className="text-red-500 hover:text-red-700"
+                            >
+                                <Trash className="w-4 h-4" />
+                            </button>
+                        </div>
+                    ))}
+                    <div className='flex items-center justify-end gap-2'>
+                        <button
+                            type="button"
+                            onClick={() => handleAddReduction()}
+                            className="text-blue-500 bg-blue-100 px-2 py-1 rounded-lg flex items-center gap-2 hover:text-blue-700"
+                        >
+                            {t("package.add_discount_rules")}
                             <Plus className="w-4 h-4" />
                         </button>
                     </div>

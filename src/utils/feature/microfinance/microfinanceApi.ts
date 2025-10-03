@@ -48,8 +48,8 @@ export const microfinanceApi = createApi({
             }),
             invalidatesTags:['microfinances']
         }),
-        createTenantLicence:builder.mutation<{success:boolean}, {user_id:number, license_plan_id:number,lang:string,auth_token:string}>({
-            query:({user_id, license_plan_id, lang, auth_token})=>({
+        createTenantLicence:builder.mutation<{success:boolean}, {months:number,user_id:number, license_plan_id:number,lang:string,auth_token:string}>({
+            query:({user_id, license_plan_id, lang, auth_token,months})=>({
                 url:"/tenant-licenses",
                 method:"POST",
                 params:{lang},
@@ -57,7 +57,8 @@ export const microfinanceApi = createApi({
                     user_id,
                     license_plan_id, 
                     lang,
-                    auth_token
+                    auth_token,
+                    months
                 }
             }),
             invalidatesTags:['microfinances']

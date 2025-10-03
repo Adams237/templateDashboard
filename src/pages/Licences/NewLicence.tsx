@@ -1,4 +1,4 @@
-import React from 'react'
+
 import NewLicenceForm from '../../components/forms/NewLicenceForm'
 import { useCreateLicenceMutation } from '../../utils/feature/licence/licenceApi'
 import { LicenceRequest } from '../../utils/feature/licence/type'
@@ -9,15 +9,20 @@ function NewLicence() {
   const { t, i18n } = useTranslation()
   const [create] = useCreateLicenceMutation()
   const handleCreate = async (data: LicenceRequest) => {
-    console.log(data)
     try {
-      const newData:LicenceRequest = {
+      const newData: LicenceRequest = {
         ...data,
-        max_transactions:Number(data.max_transactions),
-        max_users:Number(data.max_users),
-        number_of_months :Number(data.number_of_months), 
-        monthly_price:Number(data.monthly_price)
+        popular: data.popular === "true" ? true : false,
+        max_transactions: Number(data.max_transactions),
+        max_users: Number(data.max_users),
+        number_of_months: Number(data.number_of_months),
+        monthly_price: Number(data.monthly_price),
+        discount_rules: data.discount_rules.map((item) => ({
+          from_months: Number(item.from_months),
+          percent: Number(item.percent)
+        }))
       }
+      console.log(newData)
       await create(newData).unwrap()
       toast.success(t("package.success_created"))
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

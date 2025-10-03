@@ -2,7 +2,7 @@
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import logo from "../../assets/images/logo_collect_black.png"
+import logo from "/icon_transparent.png"
 import { Loader2 } from 'lucide-react'
 
 // 1. Définition des données du formulaire
@@ -32,7 +32,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
       className="max-w-md mx-auto w-[80%] p-6 bg-white rounded-2xl shadow-md space-y-6"
     >
       <div className="flex justify-center items-center">
-        <img src={logo} alt="Logo Collect" />
+        <img className='w-20 h-20' src={logo} alt="Logo Collect" />
       </div>
 
       <h2 className="text-2xl font-bold text-center">

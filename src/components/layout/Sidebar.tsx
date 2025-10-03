@@ -8,13 +8,15 @@ import {
   User,
   Backpack,
   KeyboardMusic,
+  MessageCircle,
 } from 'lucide-react';
 // import { UserInterface } from '../../utils/interfaces/user.interface';
 
 const links = [
-  { path: '/dashboard', label: 'Tableau de bord', icon: BarChart3 },
+  // { path: '/dashboard', label: 'Tableau de bord', icon: BarChart3 },
   { path: '/clients', label: 'Microfinance', icon: Users },
   { path: '/accounts', label: 'Packages', icon: Backpack },
+  { path: '/messages', label: 'Messages', icon: MessageCircle },
   { path: '/settings', label: 'Paramètres', icon: Settings },
   { path: '/account', label: 'Compte', icon: User },
   { path: '/licence-microfinance', label: 'Licences', icon: KeyboardMusic },
@@ -35,7 +37,9 @@ export default function Sidebar() {
   return (
     <aside className="fixed overflow-y-auto inset-y-0 left-0 w-56 bg-white shadow-md">
       <div className="p-4">
-        <h1 className="text-xl font-bold mb-6">BankAdmin</h1>
+        <h1 className="text-xl font-bold mb-6">
+          <img src='/logo_transparent.png' />
+        </h1>
         <nav className="space-y-2">
           {currentLink.map(({ path, label, icon: Icon }) => (
             <NavLink

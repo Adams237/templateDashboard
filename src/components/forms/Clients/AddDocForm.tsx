@@ -50,7 +50,7 @@ const AddDocForm: React.FC<DataProps> = ({ onSubmit }) => {
                 </div>
                 <div className='ml-2'>
                     <label htmlFor="name" className="block text-sm font-medium mb-1">
-                        {t("microfinace.document_number")}
+                        {t("microfinace.document_type")}
                     </label>
                     <input
                         id="microfinace"
@@ -72,7 +72,7 @@ const AddDocForm: React.FC<DataProps> = ({ onSubmit }) => {
                 {/* Picture */}
                 <div>
                     <label htmlFor="Picture" className="block text-sm font-medium mb-1">
-                        {t("microfinace.picture")}
+                        {t("microfinace.document")}
                     </label>
                     <Controller
                         name="file_url"
